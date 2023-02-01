@@ -28,7 +28,7 @@ public class ChatForward {
     private Map<String, Long> Timestamp = new HashMap<>();
     public Config config;
     public QQChat qqChat;
-    private int CD = 30;
+    private int CD;
     private boolean ChatForwardEnabled;
 
     public ChatForward(ChatBridgeVelocity plugin) {
@@ -202,7 +202,7 @@ public class ChatForward {
     private boolean getTimestamp(String name) {
         if (!this.Timestamp.containsKey(name)) {
             setTimestamp(name);
-            return false;
+            return true;
         }
         // 大于冷却时间
         if (System.currentTimeMillis() / 1000 - this.Timestamp.get(name) >= 30) {
