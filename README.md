@@ -78,10 +78,3 @@
   "token": "TOKEN"
 }
 ```
-
-#### 像素仙缘 FSP-Fantasy story in pixel world
-* 是一个 Minecraft Java 版的服务器
-* 公益
-* 正版验证
-* 入服需审核
-* [点我](https://space.bilibili.com/661916647)
