@@ -28,14 +28,14 @@ public class ChatForward {
     private Map<String, Long> Timestamp = new HashMap<>();
     public Config config;
     public QQChat qqChat;
-    private int CD;
+    private long CD;
     private boolean ChatForwardEnabled;
 
     public ChatForward(ChatBridgeVelocity plugin) {
         this.server = plugin.server;
         this.logger = plugin.logger;
         this.config = plugin.config;
-        this.CD = config.getCD();
+        this.CD = config.getCD() * 1000;
         this.ChatForwardEnabled = config.ChatForwardEnabled();
         setQQChat();
     }
@@ -205,7 +205,7 @@ public class ChatForward {
             return true;
         }
         // 大于冷却时间
-        if (System.currentTimeMillis() / 1000 - this.Timestamp.get(name) >= 30) {
+        if (System.currentTimeMillis() - this.Timestamp.get(name) > this.CD) {
             setTimestamp(name);
             return true;
         }
@@ -213,7 +213,7 @@ public class ChatForward {
     }
 
     private void setTimestamp(String name) {
-        this.Timestamp.put(name, System.currentTimeMillis() / 1000);
+        this.Timestamp.put(name, System.currentTimeMillis());
     }
 
     public void qqChatClose() {
