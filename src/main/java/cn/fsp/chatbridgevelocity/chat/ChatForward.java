@@ -118,8 +118,10 @@ public class ChatForward {
         String playerName = event.getPlayer().getUsername();
         String previousServer = playerCurrentServer.get(playerName);
         for (RegisteredServer server1 : server.getAllServers()) {
-            for (Player player : server1.getPlayersConnected()) {
-                player.sendMessage(left(previousServer, playerName));
+            if (!server1.getServerInfo().getName().equals(previousServer)) {
+                for (Player player : server1.getPlayersConnected()) {
+                    player.sendMessage(left(previousServer, playerName));
+                }
             }
         }
         playerCurrentServer.remove(playerName);
