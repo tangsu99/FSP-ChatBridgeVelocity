@@ -13,6 +13,8 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.slf4j.Logger;
 
 import java.net.URI;
@@ -151,8 +153,8 @@ public class ChatForward {
     public void allPlayerSendMessage(String name, String msg) {
         for (Player player : server.getAllPlayers()) {
             player.sendMessage(Msg("QQ", name, msg));
-            logger.info("[QQ]<" + name + "> " + msg);
         }
+        logger.info("[QQ]<" + name + "> " + msg);
     }
 
     public StringBuilder getOnline() {
@@ -183,13 +185,13 @@ public class ChatForward {
 
     private Component join(String serverName, String playerName) {
         MessageFormat str = new MessageFormat(config.getJoinFormat());
-        Component msg = Component.text(str.format(new String[]{serverName, playerName}));
+        Component msg = Component.text(str.format(new String[]{serverName, playerName})).color(NamedTextColor.GRAY);
         return msg;
     }
 
     private Component left(String serverName, String playerName) {
         MessageFormat str = new MessageFormat(config.getLeftFormat());
-        Component msg = Component.text(str.format(new String[]{serverName, playerName}));
+        Component msg = Component.text(str.format(new String[]{serverName, playerName})).color(NamedTextColor.GRAY);
         return msg;
     }
 
