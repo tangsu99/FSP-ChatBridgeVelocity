@@ -73,6 +73,7 @@ public class QQChat extends WebSocketClient {
             return;
         }
         logger.error("发送失败, 无法连接");
+        connect();
     }
 
     public void sendMessage(StringBuilder msg, String echo) {
@@ -81,5 +82,6 @@ public class QQChat extends WebSocketClient {
             return;
         }
         logger.error("发送失败, 无法连接");
+        connect();
     }
 }
