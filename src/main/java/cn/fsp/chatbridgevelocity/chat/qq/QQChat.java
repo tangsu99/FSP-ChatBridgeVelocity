@@ -34,6 +34,9 @@ public class QQChat extends WebSocketClient {
     @Override
     public void onMessage(String s) {
         JsonObject jsonObject = gson.fromJson(s, JsonObject.class);
+        if (!jsonObject.has("message_type")) {
+            return;
+        }
         if (jsonObject.get("message_type").getAsString().equals("group")) {
             if (jsonObject.get("group_id").getAsString().equals(config.getQQGroup())) {
                 String message = jsonObject.get("message").getAsString();
