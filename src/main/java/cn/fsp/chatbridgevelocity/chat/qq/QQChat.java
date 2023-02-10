@@ -1,11 +1,10 @@
 package cn.fsp.chatbridgevelocity.chat.qq;
 
 import cn.fsp.chatbridgevelocity.chat.ChatForward;
-import cn.fsp.chatbridgevelocity.chat.qq.API.sendGroupMsg;
-import cn.fsp.chatbridgevelocity.chat.qq.Event.groupEvent;
 import cn.fsp.chatbridgevelocity.config.Config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.velocitypowered.api.proxy.ProxyServer;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
@@ -34,27 +33,37 @@ public class QQChat extends WebSocketClient {
 
     @Override
     public void onMessage(String s) {
-        if (s.startsWith("{\"post_type\":\"message\",\"message_type\":\"group\"")) {
-            groupEvent event = gson.fromJson(s, groupEvent.class);
-            if (event.group_id.equals(config.getQQGroup())) {
-                if (event.message.startsWith(config.getQQRespondPrefix())) {
-                    String msg = event.message.substring(4, event.message.length()).trim();
-                    chatForward.allPlayerSendMessage(event.sender.card, msg);
+        JsonObject jsonObject = gson.fromJson(s, JsonObject.class);
+        if (jsonObject.get("message_type").getAsString().equals("group")) {
+            if (jsonObject.get("group_id").getAsString().equals(config.getQQGroup())) {
+                String message = jsonObject.get("message").getAsString();
+                JsonObject sender = jsonObject.get("sender").getAsJsonObject();
+                String name = getName(sender);
+                if (message.startsWith(config.getQQRespondPrefix())) {
+                    String msg = message.substring(4, message.length()).trim();
+                    chatForward.allPlayerSendMessage(name, msg);
                 }
-                if (event.message.equals("!!online")) {
-                    sendMessage(chatForward.getOnline(), "online");
+                if (message.equals("!!online")) {
+                    sendMessage(chatForward.getOnline().toString(), "online");
                 }
-                if (event.message.equals("!!ping")) {
+                if (message.equals("!!ping")) {
                     sendMessage("pong!!", "pong");
                 }
-                if (event.message.equals("!!help")) {
+                if (message.equals("!!help")) {
                     sendMessage("FSP-ChatBridgeVelocity\n!!help\t显示此信息\n!!mc\t发送信息到mc\n!!ping\tpong!!", "help");
                 }
-                if (event.message.equals("信不信群里都是我小号，不信我换另一个号再发一遍")) {
+                if (message.equals("信不信群里都是我小号，不信我换另一个号再发一遍")) {
                     sendMessage("信不信群里都是我小号，不信我换另一个号再发一遍", "rua");
                 }
             }
         }
+    }
+
+    private String getName(JsonObject sender) {
+        if (!sender.get("card").getAsString().equals("")) {
+            return sender.get("card").getAsString();
+        }
+        return sender.get("nickname").getAsString();
     }
 
     @Override
@@ -72,16 +81,16 @@ public class QQChat extends WebSocketClient {
             send(gson.toJson(new sendGroupMsg(config.getQQGroup(), msg, echo)));
             return;
         }
-        logger.error("发送失败, 无法连接");
-        connect();
+        reconnect();
+        sendMessage(msg, echo, 1);
     }
 
-    public void sendMessage(StringBuilder msg, String echo) {
+    private void sendMessage(String msg, String echo, int i) {
         if (isOpen()) {
-            send(gson.toJson(new sendGroupMsg(config.getQQGroup(), msg.toString(), echo)));
+            send(gson.toJson(new sendGroupMsg(config.getQQGroup(), msg, echo)));
             return;
         }
         logger.error("发送失败, 无法连接");
-        connect();
+        reconnect();
     }
 }
