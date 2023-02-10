@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'cn.fsp'
-version = '0.1.1'
+version = '0.1.2'
 
 repositories {
     mavenCentral()
@@ -16,16 +16,10 @@ repositories {
 }
 
 dependencies {
-//    testImplementation 'junit:junit:4.13.1'
-//    compileOnly 'com.velocitypowered:velocity-api:3.1.1'
-//    annotationProcessor 'com.velocitypowered:velocity-api:3.1.1'
-//    implementation 'org.java-websocket:Java-WebSocket:1.5.3'
-//    compileOnly 'org.java-websocket:Java-WebSocket:1.5.3'
     testImplementation 'junit:junit:4.13.1'
     compileOnly 'com.velocitypowered:velocity-api:3.1.1'
     annotationProcessor 'com.velocitypowered:velocity-api:3.1.1'
     implementation 'org.java-websocket:Java-WebSocket:1.5.3'
-//    include 'org.java-websocket:Java-WebSocket:1.5.3'
 }
 
 def targetJavaVersion = 11
