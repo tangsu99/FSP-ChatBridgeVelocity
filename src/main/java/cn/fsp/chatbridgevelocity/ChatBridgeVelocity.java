@@ -46,4 +46,8 @@ public class ChatBridgeVelocity {
     public void onProxyShutdownEvent(ProxyShutdownEvent event) {
         chatForward.qqChatClose();
     }
+
+    public void reload() {
+        // TODO
+    }
 }

@@ -21,4 +21,10 @@ public class CmdHandler {
         source.sendMessage(Component.text("FSP-ChatBridgeVelocity 命令帮助"));
         return 1;
     }
+
+    public int reload(CommandContext<CommandSource> commandSourceCommandContext) {
+        chatBridgeVelocity.reload();
+        commandSourceCommandContext.getSource().sendMessage(Component.text("Reload done!"));
+        return 1;
+    }
 }
