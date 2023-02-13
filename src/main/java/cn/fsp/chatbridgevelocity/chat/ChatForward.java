@@ -209,7 +209,7 @@ public class ChatForward {
             return true;
         }
         // 大于冷却时间
-        if (System.currentTimeMillis() - this.Timestamp.get(name) > this.CD) {
+        if (System.currentTimeMillis() >= this.Timestamp.get(name)) {
             setTimestamp(name);
             return true;
         }
@@ -217,7 +217,7 @@ public class ChatForward {
     }
 
     private void setTimestamp(String name) {
-        this.Timestamp.put(name, System.currentTimeMillis());
+        this.Timestamp.put(name, System.currentTimeMillis() + this.CD);
     }
 
     public void qqChatClose() {
