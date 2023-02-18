@@ -55,9 +55,6 @@ public class QQChat extends WebSocketClient {
                 if (message.equals("!!help")) {
                     sendMessage("FSP-ChatBridgeVelocity\n!!help\t显示此信息\n!!mc\t发送信息到mc\n!!ping\tpong!!", "help");
                 }
-                if (message.equals("信不信群里都是我小号，不信我换另一个号再发一遍")) {
-                    sendMessage("信不信群里都是我小号，不信我换另一个号再发一遍", "rua");
-                }
             }
         }
     }
