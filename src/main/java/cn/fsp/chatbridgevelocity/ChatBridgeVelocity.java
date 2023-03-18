@@ -2,6 +2,7 @@ package cn.fsp.chatbridgevelocity;
 
 import cn.fsp.chatbridgevelocity.chat.ChatForward;
 import cn.fsp.chatbridgevelocity.command.CmdBuilder;
+import cn.fsp.chatbridgevelocity.command.CommandReg;
 import cn.fsp.chatbridgevelocity.config.Config;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
@@ -39,6 +40,7 @@ public class ChatBridgeVelocity {
         chatForward = new ChatForward(this);
         server.getEventManager().register(this, chatForward);
         commandManager.register(injector.getInstance(CmdBuilder.class).register(this));
+        CommandReg.regCommand(commandManager, this);
         server.getPluginManager().getPlugin("fsp-whitelist").isEmpty();
     }
 

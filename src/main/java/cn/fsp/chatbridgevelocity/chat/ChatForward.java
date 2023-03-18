@@ -9,9 +9,11 @@ import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.player.PlayerChatEvent;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.player.ServerConnectedEvent;
+import com.velocitypowered.api.event.proxy.ProxyPingEvent;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
+import com.velocitypowered.api.proxy.server.ServerPing;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.slf4j.Logger;
@@ -57,6 +59,16 @@ public class ChatForward {
         qqChat.addHeader("Authorization", "Bearer " + config.getToken());
         qqChat.connect();
     }
+
+//    @Subscribe
+//    public void onPing(ProxyPingEvent event) {
+//        logger.info(event.getPing().toString());
+//        ServerPing response = event.getPing();
+//        ServerPing.SamplePlayer[] playerInfo = server.getAllPlayers().stream().map(player -> new ServerPing
+//                .SamplePlayer(player.getUsername(), player.getUniqueId())).toArray(ServerPing.SamplePlayer[]::new);
+//        ServerPing newResponse = response.asBuilder().samplePlayers(playerInfo).build();
+//        event.setPing(newResponse);
+//    }
 
     @Subscribe
     public void onPlayerChatEvent(PlayerChatEvent event) {
@@ -154,6 +166,14 @@ public class ChatForward {
             player.sendMessage(Msg("QQ", name, msg));
         }
         logger.info("[QQ]<" + name + "> " + msg);
+    }
+
+    public void sendMessageALL(String msg) {
+        for (Player player : server.getAllPlayers()) {
+            player.sendMessage(Component.text("[Velocity] " + msg).color(NamedTextColor.GRAY));
+        }
+        qqChat.sendMessage("[Velocity] " + msg, "Velocity");
+        logger.info("[Velocity] " + msg);
     }
 
     public StringBuilder getOnline() {
