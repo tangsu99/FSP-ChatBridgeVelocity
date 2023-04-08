@@ -1,11 +1,11 @@
 package cn.fsp.chatbridgevelocity.chat.qq;
 
-public class sendGroupMsg {
+public class GoCQHttpSendGroupMsg {
     String action = "send_group_msg";
     Params params;
     String echo;
 
-    public sendGroupMsg(String group_id, String msg, String echo) {
+    public GoCQHttpSendGroupMsg(String group_id, String msg, String echo) {
         this.echo = echo;
         params = new Params(group_id, msg);
     }

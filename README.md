@@ -6,7 +6,10 @@
 ```
 /cbv            显示帮助
 ```
-* QQ群聊天互通需要 [go-cqhttp](https://docs.go-cqhttp.org/guide/#go-cqhttp)，并配置正向 Websocket
+* QQ群聊天转发
+* 使用[go-cqhttp](https://docs.go-cqhttp.org/guide/#go-cqhttp)，并配置正向 Websocket
+* 或使用[mirai](https://docs.mirai.mamoe.net/)的[mirai-api-http](https://docs.mirai.mamoe.net/mirai-api-http/)
+* 使用`mirai-api-http`须在`mirai-api-http`配置文件中开启`verifyKey`，关闭`singleMode`
 * 群内指令
 ```
 !!help          显示帮助
@@ -65,16 +68,22 @@
   "QQJoinMessageEnabled": true,
   // QQ群玩家加入信息冷却时间，默认30秒，防止玩家反复进出服务器造成群内刷屏
   "CD": 30,
+  
+  // 是否使用 goCQHttp，使用 miari-api-http 时须更改为 false
+  "goCQHttp": true,
   // QQ群玩家加入信息格式化
   "QQJoinFormat": "{0} joined game.",
-  
-  // 需要互通的群号
-  "QQGroup": "0000000000",
-  // go-cqhttp Websocket 地址
+
+  // 机器人所登录的的QQ帐号
+  "goCQHttp": "000000000",
+  // 需要互通的群
+  "QQGroup": "000000000",
+  // 服务器地址
   "host": "127.0.0.1",
-  // go-cqhttp Websocket 端口
+  // 服务器端口
   "port": "6700",
   // go-cqhttp 配置文件内设置的 access-token
+  // 或者 miari-api-http 配置文件内设置的 verifyKey
   "token": "TOKEN"
 }
 ```

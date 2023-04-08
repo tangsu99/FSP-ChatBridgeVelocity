@@ -2,6 +2,8 @@ package cn.fsp.chatbridgevelocity.chat;
 
 import cn.fsp.chatbridgevelocity.ChatBridgeVelocity;
 import cn.fsp.chatbridgevelocity.chat.qq.QQChat;
+import cn.fsp.chatbridgevelocity.chat.util.GoCQHttpHandler;
+import cn.fsp.chatbridgevelocity.chat.util.MiraiHandler;
 import cn.fsp.chatbridgevelocity.config.Config;
 import com.velocitypowered.api.event.connection.ConnectionHandshakeEvent;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
@@ -9,11 +11,9 @@ import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.player.PlayerChatEvent;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.player.ServerConnectedEvent;
-import com.velocitypowered.api.event.proxy.ProxyPingEvent;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
-import com.velocitypowered.api.proxy.server.ServerPing;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.slf4j.Logger;
@@ -33,6 +33,7 @@ public class ChatForward {
     public QQChat qqChat;
     private long CD;
     private boolean ChatForwardEnabled;
+    private URI uri1;
 
     public ChatForward(ChatBridgeVelocity plugin) {
         this.server = plugin.server;
@@ -40,23 +41,36 @@ public class ChatForward {
         this.config = plugin.config;
         this.CD = config.getCD() * 1000;
         this.ChatForwardEnabled = config.ChatForwardEnabled();
-        setQQChat();
-    }
-
-    private void setQQChat() {
         // 功能未启用
         if (!config.getQQChatEnabled()) {
             logger.info("QQ聊天互通已禁用");
             return;
         }
-        URI uri1;
+        if (config.getGoCQHttp()) {
+            goCQHttp();
+        }else {
+            Mirai();
+        }
+    }
+
+    private void goCQHttp() {
         try {
             uri1 = new URI("ws://" + config.getHost() + ":" + config.getPort() + "/");
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
-        qqChat = new QQChat(uri1, this);
+        qqChat = new QQChat(uri1, this, new GoCQHttpHandler(this));
         qqChat.addHeader("Authorization", "Bearer " + config.getToken());
+        qqChat.connect();
+    }
+
+    private void Mirai() {
+        try {
+            uri1 = new URI("ws://" + config.getHost() + ":" + config.getPort() + "/all?verifyKey=" + config.getToken() + "&qq=" + config.getBotQQ());
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+        qqChat = new QQChat(uri1, this, new MiraiHandler(this));
         qqChat.connect();
     }
 

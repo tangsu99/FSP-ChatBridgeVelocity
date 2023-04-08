@@ -71,8 +71,16 @@ public class Config {
         return cfg.QQJoinMessageEnabled;
     }
 
+    public boolean getGoCQHttp() {
+        return cfg.goCQHttp;
+    }
+
     public String getQQJoinFormat() {
         return cfg.QQJoinFormat;
+    }
+
+    public String getBotQQ(){
+        return cfg.BotQQ;
     }
 
     public String getQQGroup() {

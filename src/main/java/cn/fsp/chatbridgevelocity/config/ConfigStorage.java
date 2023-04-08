@@ -12,7 +12,9 @@ public class ConfigStorage {
     String QQMessageFormat = "[{0}]<{1}> {2}";
     boolean QQJoinMessageEnabled = true;
     int CD = 30;
+    boolean goCQHttp = true;
     String QQJoinFormat = "{0} joined game.";
+    String BotQQ = "00000000";
     String QQGroup = "00000000";
     String host = "127.0.0.1";
     String port = "6700";
