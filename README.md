@@ -8,7 +8,7 @@
 ```
 * QQ群聊天转发
 * 使用[go-cqhttp](https://docs.go-cqhttp.org/guide/#go-cqhttp)，并配置正向 Websocket
-* 或使用[mirai](https://docs.mirai.mamoe.net/)的[mirai-api-http](https://docs.mirai.mamoe.net/mirai-api-http/)
+* 或使用[mirai](https://docs.mirai.mamoe.net/)的[mirai-api-http](https://docs.mirai.mamoe.net/mirai-api-http/)，并配置 ws
 * 使用`mirai-api-http`须在`mirai-api-http`配置文件中开启`verifyKey`，关闭`singleMode`
 * 群内指令
 ```
