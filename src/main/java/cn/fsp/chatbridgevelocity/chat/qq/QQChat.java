@@ -18,8 +18,10 @@ public class QQChat extends WebSocketClient {
     private Logger logger;
     private Config config;
     private Handler handler;
+    private boolean sync;
     public QQChat(URI serverUri, ChatForward chatForward, Handler handler) {
         super(serverUri);
+        this.sync = false;
         this.server = chatForward.server;
         this.logger = chatForward.logger;
         this.config = chatForward.config;
@@ -66,4 +68,12 @@ public class QQChat extends WebSocketClient {
         logger.error("发送失败, 无法连接");
         reconnect();
     }
+
+    public void setSync(boolean b) {
+        this.sync = b;
+    }
+    public boolean getSync() {
+        return sync;
+    }
+
 }

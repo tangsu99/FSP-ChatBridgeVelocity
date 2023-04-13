@@ -92,8 +92,12 @@ public class ChatForward {
         String currentServerName = event.getPlayer().getCurrentServer().orElseThrow().getServer().getServerInfo().getName();
         String playerName = event.getPlayer().getUsername();
         String message = event.getMessage();
-        if (message.startsWith(config.getMCRespondPrefix())) {
-            message = message.substring(4, message.length()).trim();
+        if (message.startsWith(config.getMCRespondPrefix()) || qqChat.getSync()) {
+            if (!qqChat.getSync()) {
+                message = message.substring(4).trim();
+            }else {
+                message += "\t[chatSync]";
+            }
             MessageFormat str = new MessageFormat(config.getQQMessageFormat());
             qqChat.sendMessage(str.format(new String[]{currentServerName, playerName, message}), String.valueOf(event.hashCode()));
         }

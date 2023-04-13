@@ -1,6 +1,7 @@
 package cn.fsp.chatbridgevelocity.chat.util;
 
 import cn.fsp.chatbridgevelocity.chat.ChatForward;
+import cn.fsp.chatbridgevelocity.chat.message.Message;
 import cn.fsp.chatbridgevelocity.chat.qq.QQChat;
 import cn.fsp.chatbridgevelocity.config.Config;
 import com.google.gson.Gson;
@@ -15,12 +16,14 @@ public abstract class Handler {
     public Logger logger;
     public Config config;
     public QQChat qqChat;
+    public Message message;
 
     public Handler(ChatForward chatForward) {
         this.chatForward = chatForward;
         this.server = chatForward.server;
         this.logger = chatForward.logger;
         this.config = chatForward.config;
+        this.message = new Message();
     }
 
     public abstract void setQQChat(QQChat qqChat);

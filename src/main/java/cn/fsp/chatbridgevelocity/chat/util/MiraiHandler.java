@@ -7,9 +7,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class MiraiHandler extends Handler{
     private MiraiSendGroupMsg miraiSendGroupMsg;
     private String sessionKey;
@@ -39,7 +36,6 @@ public class MiraiHandler extends Handler{
             return;
         }
         if (!data.get("type").getAsString().equals("GroupMessage")) {
-            logger.info(data.get("type").getAsString());
             return;
         }
         JsonArray messageChain = data.getAsJsonArray("messageChain");
@@ -55,27 +51,46 @@ public class MiraiHandler extends Handler{
         }
         JsonObject sender = data.get("sender").getAsJsonObject();
         String group = sender.get("group").getAsJsonObject().get("id").getAsString();
+        boolean permission = hasPermission(sender.get("permission").getAsString());
         String name = sender.get("memberName").getAsString();
         if (!group.equals(config.getQQGroup())) {
             return;
         }
-        if (message.startsWith(config.getQQRespondPrefix())) {
-            String msg = message.substring(4, message.length()).trim();
+        if (message.startsWith(config.getQQRespondPrefix()) || qqChat.getSync()) {
+            String msg;
+            if (qqChat.getSync()) {
+                msg = message + "    [chatSync]";
+            }else {
+                msg = message.substring(4).trim();
+            }
             chatForward.allPlayerSendMessage(name, msg);
         }
-        if (message.equals("!!online")) {
-            qqChat.sendMessage(chatForward.getOnline().toString(), "online");
+        switch (message) {
+            case "!!online":
+                qqChat.sendMessage(chatForward.getOnline().toString(), "online");
+                break;
+            case "!!ping":
+                qqChat.sendMessage("pong!!", "pong");
+                break;
         }
-        if (message.equals("!!ping")) {
-            qqChat.sendMessage("pong!!", "pong");
-        }
+//        if (message.equals("!!online")) {
+//            qqChat.sendMessage(chatForward.getOnline().toString(), "online");
+//        }
+//        if (message.equals("!!ping")) {
+//            qqChat.sendMessage("pong!!", "pong");
+//        }
         if (message.equals("!!help")) {
-            qqChat.sendMessage("FSP-ChatBridgeVelocity\n!!help\t显示此信息\n!!mc\t发送信息到mc\n!!ping\tpong!!", "help");
+            qqChat.sendMessage("FSP-ChatBridgeVelocity\n!!help\t显示此信息\n!!mc\t发送信息到mc\n!!chatSync on/off\t聊天同步\n!!online\t显示在线玩家\n!!ping\tpong!!", "help");
         }
+        Util.chatSync(message, permission, this.qqChat, this.message);
     }
 
     @Override
     public String send(String group, String msg) {
         return gson.toJson(miraiSendGroupMsg.setMsg(group, msg, sessionKey));
+    }
+
+    private boolean hasPermission(String permission) {
+        return permission.equals("ADMINISTRATOR") || permission.equals("OWNER");
     }
 }

@@ -12,10 +12,12 @@
 * 使用`mirai-api-http`须在`mirai-api-http`配置文件中开启`verifyKey`，关闭`singleMode`
 * 群内指令
 ```
-!!help          显示帮助
-!!mc <msg>      向服务器内玩家发送信息
-!!online        展示在线玩家
+!!help              显示帮助
+!!mc <msg>          向服务器内玩家发送信息
+!!chatSync on/off   消息同步
+!!online            展示在线玩家
 ```
+* 什么是聊天同步，开启后自动转发 mc/qq群 的聊天到 qq群/mc，群主与管理有权限开关。
 * 服内指令
 ```
 /cbv            显示帮助
@@ -85,5 +87,15 @@
   // go-cqhttp 配置文件内设置的 access-token
   // 或者 miari-api-http 配置文件内设置的 verifyKey
   "token": "TOKEN"
+}
+```
+* 聊天同步提示信息
+```json5
+{
+  "noPermission": "没有权限开关聊天同步",
+  "onState": "聊天同步已经是开启状态",
+  "offState": "聊天同步已经是关闭状态",
+  "on": "聊天同步开启成功",
+  "off": "聊天同步关闭成功"
 }
 ```

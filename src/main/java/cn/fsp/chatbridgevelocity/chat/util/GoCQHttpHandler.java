@@ -25,19 +25,30 @@ public class GoCQHttpHandler extends Handler{
                 String message = jsonObject.get("message").getAsString();
                 JsonObject sender = jsonObject.get("sender").getAsJsonObject();
                 String name = getName(sender);
-                if (message.startsWith(config.getQQRespondPrefix())) {
-                    String msg = message.substring(4, message.length()).trim();
+                if (message.startsWith(config.getQQRespondPrefix()) || qqChat.getSync()) {
+                    String msg;
+                    if (qqChat.getSync()) {
+                        msg = message + "    [chatSync]";
+                    }else {
+                        msg = message.substring(4).trim();
+                    }
                     chatForward.allPlayerSendMessage(name, msg);
+                    return;
                 }
                 if (message.equals("!!online")) {
                     qqChat.sendMessage(chatForward.getOnline().toString(), "online");
+                    return;
                 }
                 if (message.equals("!!ping")) {
                     qqChat.sendMessage("pong!!", "pong");
+                    return;
                 }
                 if (message.equals("!!help")) {
-                    qqChat.sendMessage("FSP-ChatBridgeVelocity\n!!help\t显示此信息\n!!mc\t发送信息到mc\n!!ping\tpong!!", "help");
+                    qqChat.sendMessage("FSP-ChatBridgeVelocity\n!!help\t显示此信息\n!!mc\t发送信息到mc\n!!chatSync on/off\t聊天同步\n!!online\t显示在线玩家\n!!ping\tpong!!", "help");
+                    return;
                 }
+                boolean permission = hasPermission(sender.get("role").getAsString());
+                Util.chatSync(message, permission, this.qqChat, this.message);
             }
         }
     }
@@ -52,5 +63,9 @@ public class GoCQHttpHandler extends Handler{
             return sender.get("card").getAsString();
         }
         return sender.get("nickname").getAsString();
+    }
+
+    private boolean hasPermission(String permission) {
+        return permission.equals("admin") || permission.equals("owner");
     }
 }
