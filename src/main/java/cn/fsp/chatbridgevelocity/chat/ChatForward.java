@@ -74,16 +74,6 @@ public class ChatForward {
         qqChat.connect();
     }
 
-//    @Subscribe
-//    public void onPing(ProxyPingEvent event) {
-//        logger.info(event.getPing().toString());
-//        ServerPing response = event.getPing();
-//        ServerPing.SamplePlayer[] playerInfo = server.getAllPlayers().stream().map(player -> new ServerPing
-//                .SamplePlayer(player.getUsername(), player.getUniqueId())).toArray(ServerPing.SamplePlayer[]::new);
-//        ServerPing newResponse = response.asBuilder().samplePlayers(playerInfo).build();
-//        event.setPing(newResponse);
-//    }
-
     @Subscribe
     public void onPlayerChatEvent(PlayerChatEvent event) {
         if (!this.ChatForwardEnabled) {
