@@ -46,6 +46,10 @@ public class ChatForward {
             logger.info("QQ聊天互通已禁用");
             return;
         }
+        connect();
+    }
+
+    private void connect() {
         if (config.getGoCQHttp()) {
             goCQHttp();
         }else {
@@ -169,10 +173,17 @@ public class ChatForward {
 
     }
 
+    public void serverPacketEvent(int status, String serverName) {
+        server.getAllPlayers().forEach(
+                player -> player.sendMessage((status == 49) ? serverStarted(serverName) : serverStopped(serverName))
+        );
+        logger.info(status + serverName);
+    }
+
     public void allPlayerSendMessage(String name, String msg) {
-        for (Player player : server.getAllPlayers()) {
-            player.sendMessage(Msg("QQ", name, msg));
-        }
+        server.getAllPlayers().forEach(
+                player -> player.sendMessage(Msg("QQ", name, msg))
+        );
         logger.info("[QQ]<" + name + "> " + msg);
     }
 
@@ -222,6 +233,16 @@ public class ChatForward {
         return msg;
     }
 
+    private Component serverStarted(String serverName) {
+        Component msg = Component.text(serverName + " started!").color(NamedTextColor.GRAY);
+        return msg;
+    }
+
+    private Component serverStopped(String serverName) {
+        Component msg = Component.text(serverName + " stopped!").color(NamedTextColor.GRAY);
+        return msg;
+    }
+
     /**
      * 判断记录中是否有时间戳
      * 没有会新建记录
@@ -249,10 +270,10 @@ public class ChatForward {
 
     public void qqChatClose() {
         qqChat.close();
-        if (qqChat.isOpen()) {
-            logger.info("starting");
-        }else {
-            logger.info("closed");
-        }
+    }
+
+    public void reload() {
+        qqChatClose();
+        connect();
     }
 }
