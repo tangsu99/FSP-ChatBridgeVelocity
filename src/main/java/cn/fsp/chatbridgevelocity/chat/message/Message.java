@@ -62,6 +62,7 @@ public class Message {
             throw new RuntimeException(e);
         }
         msg = gson.fromJson(configStr, MessageStorage.class);
+        saveFile();
     }
 
     private void saveFile() {

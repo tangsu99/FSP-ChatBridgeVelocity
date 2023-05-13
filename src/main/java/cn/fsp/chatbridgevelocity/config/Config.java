@@ -11,22 +11,22 @@ import java.nio.file.Paths;
 
 public class Config {
     private ConfigStorage cfg;
-    private Path path = Paths.get("./plugins/fsp-chatbridgevelocity/");
-    private Path filePath = Paths.get("./plugins/fsp-chatbridgevelocity/config.json");
+    private final Path path = Paths.get("./plugins/fsp-chatbridgevelocity/");
+    private final Path filePath = Paths.get("./plugins/fsp-chatbridgevelocity/config.json");
 
-    private Gson gson = new GsonBuilder()
+    private final Gson gson = new GsonBuilder()
             .setPrettyPrinting()
             .create();
 
     public Config() {
         try {
             Files.createDirectory(path);
-        } catch (IOException e) {
+        } catch (IOException ignored) {
         }
         try {
             Files.createFile(filePath);
             Files.write(filePath, gson.toJson(new ConfigStorage()).getBytes(StandardCharsets.UTF_8));
-        } catch (IOException e) {
+        } catch (IOException ignored) {
         }
         loadFile();
     }
@@ -91,7 +91,7 @@ public class Config {
         return cfg.host;
     }
 
-    public String getPort() {
+    public Integer getPort() {
         return cfg.port;
     }
 
@@ -101,6 +101,10 @@ public class Config {
 
     public Integer getCD() {
         return cfg.CD;
+    }
+
+    public Integer getStatusReceivedPort() {
+        return cfg.statusReceivedPort;
     }
 
     public void reLoadConfig() {
@@ -115,6 +119,7 @@ public class Config {
             throw new RuntimeException(e);
         }
         cfg = gson.fromJson(configStr, ConfigStorage.class);
+        saveFile();
     }
 
     private void saveFile() {
