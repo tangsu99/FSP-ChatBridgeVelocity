@@ -1,12 +1,21 @@
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.Socket;
+
 public class Test {
     public static void main(String[] args) {
-        char[] c1 = "0Survival".toCharArray();
-        String msg1 = "0Survival".substring(1).trim();
-        char[] c2 = "1Survival".toCharArray();
-        String msg2 = "1Survival".substring(1).trim();
-        System.out.println(c1[0] == 48);
-        System.out.println(msg1);
-        System.out.println(c2[0] == 49);
-        System.out.println(msg2);
+        try {
+            Socket s = new Socket("127.0.0.1", 5700);
+            OutputStream os = s.getOutputStream();
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os));
+            //向服务器端发送一条消息
+            bw.write(1 + "awa");
+            bw.flush();
+            s.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -5,6 +5,7 @@ import cn.fsp.chatbridgevelocity.chat.qq.QQChat;
 import cn.fsp.chatbridgevelocity.chat.util.GoCQHttpHandler;
 import cn.fsp.chatbridgevelocity.chat.util.MiraiHandler;
 import cn.fsp.chatbridgevelocity.config.Config;
+import cn.fsp.chatbridgevelocity.event.SocketEvent;
 import com.velocitypowered.api.event.connection.ConnectionHandshakeEvent;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.LoginEvent;
@@ -173,11 +174,12 @@ public class ChatForward {
 
     }
 
-    public void serverPacketEvent(int status, String serverName) {
+    @Subscribe
+    public void onSocketEvent(SocketEvent event) {
         server.getAllPlayers().forEach(
-                player -> player.sendMessage((status == 49) ? serverStarted(serverName) : serverStopped(serverName))
+                player -> player.sendMessage((event.getStatus() == 49) ? serverStarted(event.getServerName()) : serverStopped(event.getServerName()))
         );
-        logger.info(status + serverName);
+        logger.info((event.getStatus() == 49) ? (event.getServerName() + "Started!") : (event.getServerName() + "Stopped!"));
     }
 
     public void allPlayerSendMessage(String name, String msg) {

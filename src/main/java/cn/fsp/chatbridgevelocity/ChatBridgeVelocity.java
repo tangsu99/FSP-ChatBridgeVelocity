@@ -44,8 +44,9 @@ public class ChatBridgeVelocity {
         socketServer = new SocketServer(this);
         chatForward = new ChatForward(this);
         try {
-            socketServer.startListener(chatForward);
-        } catch (IOException ignored) {
+            socketServer.startListener();
+        } catch (IOException e) {
+//            throw new RuntimeException(e);
         }
         server.getEventManager().register(this, chatForward);
         commandManager.register(injector.getInstance(CmdBuilder.class).register(this));
