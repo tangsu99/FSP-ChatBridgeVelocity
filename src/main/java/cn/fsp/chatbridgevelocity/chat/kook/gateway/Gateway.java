@@ -1,6 +1,6 @@
-package cn.tangsu99.kookBot.gateway;
+package cn.fsp.chatbridgevelocity.chat.kook.gateway;
 
-import cn.tangsu99.kookBot.util.JsonUtil;
+import cn.fsp.chatbridgevelocity.chat.kook.util.JsonUtil;
 import com.google.gson.JsonObject;
 
 import java.io.IOException;
@@ -29,7 +29,6 @@ public class Gateway {
     public String getGatewayURL() {
         if (i == 2) {
             i = 0;
-            System.out.println("已达最大重试次数");
             return null;
         }
         HttpResponse<String> response;
@@ -43,14 +42,13 @@ public class Gateway {
         String message = jsonObject.get("message").getAsString();
         if (response.statusCode() != 200 || code != 0) {
             i++;
-            error();
             System.out.println(message);
             return getGatewayURL();
         }
         return jsonObject.getAsJsonObject("data").get("url").getAsString();
     }
 
-    private void error() {
-        System.out.println("第" + i + "次重试");
+    public static String getGatewayURL(String apiURl, String token) {
+        return new Gateway(apiURl, token, 0).getGatewayURL();
     }
 }

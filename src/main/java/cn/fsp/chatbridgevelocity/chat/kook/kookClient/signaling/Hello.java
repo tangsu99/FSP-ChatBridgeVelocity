@@ -1,4 +1,4 @@
-package cn.tangsu99.kookBot.kookClient.signaling;
+package cn.fsp.chatbridgevelocity.chat.kook.kookClient.signaling;
 
 import com.google.gson.JsonObject;
 

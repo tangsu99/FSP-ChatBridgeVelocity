@@ -1,7 +1,7 @@
-package cn.tangsu99.kookBot.kookClient.signaling;
+package cn.fsp.chatbridgevelocity.chat.kook.kookClient.signaling;
 
-import cn.tangsu99.kookBot.kookClient.KookClient;
-import cn.tangsu99.kookBot.util.TimeUtil;
+import cn.fsp.chatbridgevelocity.chat.kook.kookClient.KookClient;
+import cn.fsp.chatbridgevelocity.chat.kook.util.TimeUtil;
 
 public class Ping implements Runnable{
     private boolean Timeout;

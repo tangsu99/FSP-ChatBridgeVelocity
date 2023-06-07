@@ -1,4 +1,4 @@
-package cn.tangsu99.kookBot.util;
+package cn.fsp.chatbridgevelocity.chat.kook.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
