@@ -24,6 +24,9 @@
 /cbv            显示帮助
 !!qq <msg>      向QQ群内发送信息
 ```
+* kook 聊天互通
+* 须前往 kook 开发者中心 [申请](https://developer.kookapp.cn/)一个应用
+* 机器人连接模式使用 WebSocket
 * 配置文件
 ```json5
 {
@@ -64,7 +67,7 @@
   "leftFormat": "[{0}] {1} left {0}",
   
   // QQ群聊天互通
-  "QQChatEnabled": true,
+  "QQChatEnabled": false,
   // QQ群聊天信息格式化
   "QQMessageFormat": "[{0}]<{1}> {2}",
   // 是否向QQ群转发玩家加入信息
@@ -90,7 +93,16 @@
   "token": "TOKEN",
   
   // 接收子服务器开关服状态的端口
-  "statusReceivedPort": 5700
+  "statusReceivedPort": 5700,
+  
+  // kook 互通
+  "kookChatEnabled": false,
+  // 机器人 TOKEN
+  "kookBotToken": "TOKEN",
+  // 指定服务器 ID，只响应此服务器
+  "kookServerID": "000000000000000",
+  // 指定频道 ID，聊天互通频道
+  "kookChannelID": "000000000000000"
 }
 ```
 * 聊天同步提示信息
