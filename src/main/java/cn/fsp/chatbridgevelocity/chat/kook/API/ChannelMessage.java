@@ -1,6 +1,7 @@
-package cn.fsp.chatbridgevelocity.chat.kook.sendMessage;
+package cn.fsp.chatbridgevelocity.chat.kook.API;
 
 import cn.fsp.chatbridgevelocity.chat.kook.util.JsonUtil;
+import cn.fsp.chatbridgevelocity.chat.kook.util.URIUtil;
 import com.google.gson.JsonObject;
 
 import java.io.IOException;
@@ -11,27 +12,19 @@ import java.net.http.HttpResponse;
 
 public class ChannelMessage {
     private final HttpClient httpClient;
-    private HttpRequest request;
-    private final String token;
     private final URI uri;
-    //    https://www.kookapp.cn/api/v3/message/create?compress=0
+    private final String token;
 
-    public ChannelMessage(String apiURL,String token, int compress){
-        this.uri = URI.create(apiURL + "?compress=" + (compress == 0 ? 0 : 1));
+    public ChannelMessage(String token) {
         this.httpClient = HttpClient.newHttpClient();
+        this.uri = URIUtil.createURI("https://www.kookapp.cn/api/v3/message/create");
         this.token = token;
     }
 
-    public ChannelMessage(URI uri,String token){
-        this.uri = uri;
-        this.httpClient = HttpClient.newHttpClient();
-        this.token = token;
-    }
-
-    public String sendMessage(String body) {
-        request = HttpRequest.newBuilder()
+    public int sendMessage(String body) {
+        HttpRequest request = HttpRequest.newBuilder()
                 .uri(uri)
-                .header("Authorization", token)
+                .header("Authorization", "Bot " + token)
                 .header("Content-type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(body))
                 .build();
@@ -39,12 +32,13 @@ public class ChannelMessage {
         try {
             response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
+//            throw new RuntimeException(e);
+            return 1000;
         }
         if (response.statusCode() != 200) {
-            return null;
+            return 1000;
         }
         JsonObject jsonObject = JsonUtil.getJsonObject(response.body());
-        return jsonObject.toString();
+        return jsonObject.get("code").getAsInt();
     }
 }

@@ -1,6 +1,6 @@
-package cn.fsp.chatbridgevelocity.chat.kook.kookClient.signaling;
+package cn.fsp.chatbridgevelocity.chat.kook.signaling;
 
-import cn.fsp.chatbridgevelocity.chat.kook.kookClient.KookClient;
+import cn.fsp.chatbridgevelocity.chat.kook.KookClient;
 import cn.fsp.chatbridgevelocity.chat.kook.util.TimeUtil;
 
 public class Ping implements Runnable{

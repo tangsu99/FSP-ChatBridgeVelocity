@@ -1,6 +1,7 @@
-package cn.fsp.chatbridgevelocity.chat.util;
+package cn.fsp.chatbridgevelocity.chat.qq.handler;
 
 import cn.fsp.chatbridgevelocity.chat.ChatForward;
+import cn.fsp.chatbridgevelocity.chat.Command;
 import cn.fsp.chatbridgevelocity.chat.qq.MiraiSendGroupMsg;
 import cn.fsp.chatbridgevelocity.chat.qq.QQChat;
 import com.google.gson.JsonArray;
@@ -82,7 +83,7 @@ public class MiraiHandler extends Handler{
         if (message.equals("!!help")) {
             qqChat.sendMessage("FSP-ChatBridgeVelocity\n!!help\t显示此信息\n!!mc\t发送信息到mc\n!!chatSync on/off\t聊天同步\n!!online\t显示在线玩家\n!!ping\tpong!!", "help");
         }
-        Util.chatSync(message, permission, this.qqChat, this.message);
+        Command.chatSync(message, permission, this.qqChat, this.message);
     }
 
     @Override

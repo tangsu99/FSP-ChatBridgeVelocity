@@ -107,6 +107,22 @@ public class Config {
         return cfg.statusReceivedPort;
     }
 
+    public boolean getKookEnabled() {
+        return cfg.kookChatEnabled;
+    }
+
+    public String getKookBotToken() {
+        return cfg.kookBotToken;
+    }
+
+    public String getKookServerID() {
+        return cfg.kookServerID;
+    }
+
+    public String getKookChannelID() {
+        return cfg.kookChannelID;
+    }
+
     public void reLoadConfig() {
         loadFile();
     }

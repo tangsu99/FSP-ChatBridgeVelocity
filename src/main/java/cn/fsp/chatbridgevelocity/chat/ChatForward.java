@@ -1,10 +1,13 @@
 package cn.fsp.chatbridgevelocity.chat;
 
 import cn.fsp.chatbridgevelocity.ChatBridgeVelocity;
+import cn.fsp.chatbridgevelocity.chat.kook.util.ChannelMsgBody;
+import cn.fsp.chatbridgevelocity.chat.kook.util.URIUtil;
 import cn.fsp.chatbridgevelocity.chat.qq.QQChat;
-import cn.fsp.chatbridgevelocity.chat.util.GoCQHttpHandler;
-import cn.fsp.chatbridgevelocity.chat.util.MiraiHandler;
+import cn.fsp.chatbridgevelocity.chat.qq.handler.GoCQHttpHandler;
+import cn.fsp.chatbridgevelocity.chat.qq.handler.MiraiHandler;
 import cn.fsp.chatbridgevelocity.config.Config;
+import cn.fsp.chatbridgevelocity.event.KookMessageEvent;
 import cn.fsp.chatbridgevelocity.event.SocketEvent;
 import com.velocitypowered.api.event.connection.ConnectionHandshakeEvent;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
@@ -19,8 +22,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.slf4j.Logger;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,20 +35,25 @@ public class ChatForward {
     public QQChat qqChat;
     private long CD;
     private boolean ChatForwardEnabled;
-    private URI uri1;
+    private boolean qqChatEnabled;
+    private boolean kookChatEnabled;
+    public ChatBridgeVelocity plugin;
 
     public ChatForward(ChatBridgeVelocity plugin) {
+        this.plugin = plugin;
         this.server = plugin.server;
         this.logger = plugin.logger;
         this.config = plugin.config;
         this.CD = config.getCD() * 1000;
         this.ChatForwardEnabled = config.ChatForwardEnabled();
-        // 功能未启用
-        if (!config.getQQChatEnabled()) {
+        this.qqChatEnabled = config.getQQChatEnabled();
+        this.kookChatEnabled = config.getKookEnabled();
+        // qq 互通
+        if (qqChatEnabled) {
+            connect();
+        }else {
             logger.info("QQ聊天互通已禁用");
-            return;
         }
-        connect();
     }
 
     private void connect() {
@@ -59,23 +65,23 @@ public class ChatForward {
     }
 
     private void goCQHttp() {
-        try {
-            uri1 = new URI("ws://" + config.getHost() + ":" + config.getPort() + "/");
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
-        qqChat = new QQChat(uri1, this, new GoCQHttpHandler(this));
+//        try {
+//            uri1 = new URI("ws://" + config.getHost() + ":" + config.getPort() + "/");
+//        } catch (URISyntaxException e) {
+//            throw new RuntimeException(e);
+//        }
+        qqChat = new QQChat(URIUtil.createURI("ws://" + config.getHost() + ":" + config.getPort() + "/"), this, new GoCQHttpHandler(this));
         qqChat.addHeader("Authorization", "Bearer " + config.getToken());
         qqChat.connect();
     }
 
     private void Mirai() {
-        try {
-            uri1 = new URI("ws://" + config.getHost() + ":" + config.getPort() + "/all?verifyKey=" + config.getToken() + "&qq=" + config.getBotQQ());
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
-        qqChat = new QQChat(uri1, this, new MiraiHandler(this));
+//        try {
+//            uri1 = new URI("ws://" + config.getHost() + ":" + config.getPort() + "/all?verifyKey=" + config.getToken() + "&qq=" + config.getBotQQ());
+//        } catch (URISyntaxException e) {
+//            throw new RuntimeException(e);
+//        }
+        qqChat = new QQChat(URIUtil.createURI("ws://" + config.getHost() + ":" + config.getPort() + "/all?verifyKey=" + config.getToken() + "&qq=" + config.getBotQQ()), this, new MiraiHandler(this));
         qqChat.connect();
     }
 
@@ -94,7 +100,9 @@ public class ChatForward {
                 message += "\t[chatSync]";
             }
             MessageFormat str = new MessageFormat(config.getQQMessageFormat());
-            qqChat.sendMessage(str.format(new String[]{currentServerName, playerName, message}), String.valueOf(event.hashCode()));
+            if (qqChatEnabled) {
+                qqChat.sendMessage(str.format(new String[]{currentServerName, playerName, message}), String.valueOf(event.hashCode()));
+            }
         }
         for (RegisteredServer server1 : server.getAllServers()) {
             if (!server1.getServerInfo().getName().equals(currentServerName)) {
@@ -102,6 +110,11 @@ public class ChatForward {
                     player.sendMessage(Msg(currentServerName, playerName, message));
                 }
             }
+        }
+        if (kookChatEnabled) {
+            ChatBridgeVelocity.channelMessage.sendMessage(
+                    ChannelMsgBody.msgBody(
+                            config.getKookChannelID(), "[" + currentServerName + "]<" + playerName + "> " + message));
         }
         logger.info("[" + currentServerName + "]<" + playerName + "> " + message);
     }
@@ -164,14 +177,29 @@ public class ChatForward {
         if (event.getResult().isAllowed()) {
             if (getTimestamp(playerName)) {
                 MessageFormat str = new MessageFormat(config.getQQJoinFormat());
-                qqChat.sendMessage(str.format(new String[]{playerName}), String.valueOf(event.hashCode()));
+                if (qqChatEnabled) {
+                    qqChat.sendMessage(str.format(new String[]{playerName}), String.valueOf(event.hashCode()));
+                }
             }
         }
     }
 
     @Subscribe
-    public void onConnectionHandshakeEvent(ConnectionHandshakeEvent event) {
-
+    public void onKookMessageEvent(KookMessageEvent event) {
+        // 功能禁用与停止对非指定服务器的相应
+        if (!kookChatEnabled || !config.getKookServerID().equals(event.getServer())) {
+            return;
+        }
+        // online 指令
+        if (event.getMessage().startsWith("!!online")) {
+            ChatBridgeVelocity.channelMessage.sendMessage(
+                    ChannelMsgBody.msgBody(event.getChannel(), getOnline().toString()));
+            return;
+        }
+        // 只转发指定频道的消息
+        if (config.getKookChannelID().equals(event.getChannel())) {
+            allPlayerSendMessage(event.getSender(), event.getMessage(), "[KOOK]");
+        }
     }
 
     @Subscribe
@@ -189,11 +217,24 @@ public class ChatForward {
         logger.info("[QQ]<" + name + "> " + msg);
     }
 
+    public void allPlayerSendMessage(String name, String msg, String p) {
+        server.getAllPlayers().forEach(
+                player -> player.sendMessage(Msg(p, name, msg))
+        );
+        logger.info(p + "<" + name + "> " + msg);
+    }
+
     public void sendMessageALL(String msg) {
+        String s = "[Velocity] " + msg;
         for (Player player : server.getAllPlayers()) {
-            player.sendMessage(Component.text("[Velocity] " + msg).color(NamedTextColor.GRAY));
+            player.sendMessage(Component.text(s).color(NamedTextColor.GRAY));
         }
-        qqChat.sendMessage("[Velocity] " + msg, "Velocity");
+        if (qqChatEnabled) {
+            qqChat.sendMessage(s, "Velocity");
+        }
+        if (kookChatEnabled) {
+            sendKookMsg(s);
+        }
         logger.info("[Velocity] " + msg);
     }
 
@@ -277,5 +318,17 @@ public class ChatForward {
     public void reload() {
         qqChatClose();
         connect();
+    }
+
+    public void sendKookMsg(String s) {
+        ChatBridgeVelocity.channelMessage.sendMessage(ChannelMsgBody.msgBody(config.getKookChannelID(), s));
+    }
+
+    public void setQQChatEnabled(boolean e) {
+        this.qqChatEnabled = e;
+    }
+
+    public void setKookChatEnabled(boolean e) {
+        this.kookChatEnabled = e;
     }
 }

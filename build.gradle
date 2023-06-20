@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'cn.fsp'
-version = '0.4.1'
+version = '0.5.0'
 
 repositories {
     mavenCentral()
@@ -59,3 +59,9 @@ sourceSets.main.java.srcDir(generateTemplates.map { it.outputs })
 
 rootProject.idea.project.settings.taskTriggers.afterSync generateTemplates
 project.eclipse.synchronizationTasks(generateTemplates)
+
+task copyJar(type: Copy) {
+    from './build/libs'
+    into './run/plugins/'
+    include('**/*.jar')
+}

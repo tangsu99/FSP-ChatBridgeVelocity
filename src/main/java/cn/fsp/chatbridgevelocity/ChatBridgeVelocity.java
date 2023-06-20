@@ -1,6 +1,9 @@
 package cn.fsp.chatbridgevelocity;
 
 import cn.fsp.chatbridgevelocity.chat.ChatForward;
+import cn.fsp.chatbridgevelocity.chat.kook.API.ChannelMessage;
+import cn.fsp.chatbridgevelocity.chat.kook.API.Gateway;
+import cn.fsp.chatbridgevelocity.chat.kook.KookClient;
 import cn.fsp.chatbridgevelocity.command.CmdBuilder;
 import cn.fsp.chatbridgevelocity.command.CommandReg;
 import cn.fsp.chatbridgevelocity.config.Config;
@@ -16,6 +19,8 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import org.slf4j.Logger;
 
 import java.io.IOException;
+import java.net.URI;
+import java.util.concurrent.TimeUnit;
 
 @Plugin(
         id = "chatbridgevelocity",
@@ -37,6 +42,9 @@ public class ChatBridgeVelocity {
     public Config config;
     public ChatForward chatForward;
     private SocketServer socketServer;
+    private Gateway gateway;
+    private KookClient kookClient;
+    public static ChannelMessage channelMessage;
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
@@ -48,6 +56,8 @@ public class ChatBridgeVelocity {
         } catch (IOException e) {
 //            throw new RuntimeException(e);
         }
+        // kook 互通
+        kook();
         server.getEventManager().register(this, chatForward);
         commandManager.register(injector.getInstance(CmdBuilder.class).register(this));
         CommandReg.regCommand(commandManager, this);
@@ -57,6 +67,22 @@ public class ChatBridgeVelocity {
     public void onProxyShutdownEvent(ProxyShutdownEvent event) {
         socketServer.close();
         chatForward.qqChatClose();
+    }
+
+    private void kook() {
+        if (!config.getKookEnabled()) {
+            logger.info("kook聊天互通已禁用");
+            return;
+        }
+        this.gateway = new Gateway(config.getKookBotToken(), 0);
+        URI uri = gateway.getGatewayURL();
+        if (uri == null) {
+            logger.error("kook 网关获取错误");
+            return;
+        }
+        channelMessage = new ChannelMessage(config.getKookBotToken());
+        this.kookClient = new KookClient(uri, this);
+        this.kookClient.connect();
     }
 
     public void reload() {

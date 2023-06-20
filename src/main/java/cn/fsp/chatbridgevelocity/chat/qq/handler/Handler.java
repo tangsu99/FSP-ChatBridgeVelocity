@@ -1,4 +1,4 @@
-package cn.fsp.chatbridgevelocity.chat.util;
+package cn.fsp.chatbridgevelocity.chat.qq.handler;
 
 import cn.fsp.chatbridgevelocity.chat.ChatForward;
 import cn.fsp.chatbridgevelocity.chat.message.Message;

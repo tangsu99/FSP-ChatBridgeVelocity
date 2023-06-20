@@ -1,37 +1,45 @@
 package cn.fsp.chatbridgevelocity.chat.qq;
 
 import cn.fsp.chatbridgevelocity.chat.ChatForward;
-import cn.fsp.chatbridgevelocity.chat.util.Handler;
+import cn.fsp.chatbridgevelocity.chat.qq.handler.Handler;
 import cn.fsp.chatbridgevelocity.config.Config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.velocitypowered.api.proxy.ProxyServer;
+import com.velocitypowered.api.scheduler.ScheduledTask;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.slf4j.Logger;
 
-import java.net.URI;;
+import java.net.URI;
+import java.util.concurrent.TimeUnit;;
 
 public class QQChat extends WebSocketClient {
     private Gson gson = new GsonBuilder().create();
+    private ChatForward chatForward;
     private ProxyServer server;
     private Logger logger;
     private Config config;
     private Handler handler;
     private boolean sync;
+    private ScheduledTask connTask;
+
     public QQChat(URI serverUri, ChatForward chatForward, Handler handler) {
         super(serverUri);
         this.sync = false;
+        this.chatForward = chatForward;
         this.server = chatForward.server;
         this.logger = chatForward.logger;
         this.config = chatForward.config;
         this.handler = handler;
         this.handler.setQQChat(this);
+        logger.info("QQChat start..");
     }
 
     @Override
     public void onOpen(ServerHandshake serverHandshake) {
         logger.info("QQ 已连接");
+        startConnTask();
     }
 
     @Override
@@ -41,12 +49,14 @@ public class QQChat extends WebSocketClient {
 
     @Override
     public void onClose(int i, String s, boolean b) {
-        logger.info(s + i);
+        chatForward.setQQChatEnabled(false);
+        connTask.cancel();
     }
 
     @Override
     public void onError(Exception e) {
-        logger.error(e.getMessage());
+        logger.error("连接异常");
+        chatForward.setQQChatEnabled(false);
     }
 
     public void sendMessage(String msg, String echo) {
@@ -56,17 +66,8 @@ public class QQChat extends WebSocketClient {
 //            send(gson.toJson(new sendGroupMsg(config.getQQGroup(), msg, echo)));
             return;
         }
-        reconnect();
-        sendMessage(message, echo, 1);
-    }
-
-    private void sendMessage(String msg, String echo, int i) {
-        if (isOpen()) {
-            send(msg);
-            return;
-        }
-        logger.error("发送失败, 无法连接");
-        reconnect();
+        logger.info("连接异常，信息发送失败");
+        chatForward.setQQChatEnabled(false);
     }
 
     public void setSync(boolean b) {
@@ -76,4 +77,14 @@ public class QQChat extends WebSocketClient {
         return sync;
     }
 
+    public void startConnTask() {
+        connTask = server.getScheduler().buildTask(
+                chatForward.plugin, () -> {
+                    if (!isOpen()) {
+                        reconnect();
+                    }
+                })
+                .repeat(10L, TimeUnit.SECONDS)
+                .schedule();
+    }
 }

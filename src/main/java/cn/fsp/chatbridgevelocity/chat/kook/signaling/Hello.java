@@ -1,4 +1,4 @@
-package cn.fsp.chatbridgevelocity.chat.kook.kookClient.signaling;
+package cn.fsp.chatbridgevelocity.chat.kook.signaling;
 
 import com.google.gson.JsonObject;
 

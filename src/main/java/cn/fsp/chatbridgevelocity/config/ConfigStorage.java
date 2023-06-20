@@ -8,7 +8,7 @@ public class ConfigStorage {
     String messageFormat = "[{0}]<{1}> {2}";
     String joinFormat = "[{0}] {1} joined {0}";
     String leftFormat = "[{0}] {1} left {0}";
-    boolean QQChatEnabled = true;
+    boolean QQChatEnabled = false;
     String QQMessageFormat = "[{0}]<{1}> {2}";
     boolean QQJoinMessageEnabled = true;
     Integer CD = 30;
@@ -20,4 +20,8 @@ public class ConfigStorage {
     Integer port = 6700;
     String token = "TOKEN";
     Integer statusReceivedPort = 5700;
+    boolean kookChatEnabled = false;
+    String kookBotToken = "TOKEN";
+    String kookServerID = "0000000000000";
+    String kookChannelID = "0000000000000";
 }

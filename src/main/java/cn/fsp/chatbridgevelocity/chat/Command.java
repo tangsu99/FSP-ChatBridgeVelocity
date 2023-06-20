@@ -1,9 +1,9 @@
-package cn.fsp.chatbridgevelocity.chat.util;
+package cn.fsp.chatbridgevelocity.chat;
 
 import cn.fsp.chatbridgevelocity.chat.message.Message;
 import cn.fsp.chatbridgevelocity.chat.qq.QQChat;
 
-public class Util {
+public class Command {
     public static void chatSync(String command, boolean permission, QQChat qqChat, Message message){
         if (command.startsWith("!!chatSync") || (command.startsWith("!!chatsync"))) {
             if (!permission) {

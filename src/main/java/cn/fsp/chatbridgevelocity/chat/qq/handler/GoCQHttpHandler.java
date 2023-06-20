@@ -1,6 +1,7 @@
-package cn.fsp.chatbridgevelocity.chat.util;
+package cn.fsp.chatbridgevelocity.chat.qq.handler;
 
 import cn.fsp.chatbridgevelocity.chat.ChatForward;
+import cn.fsp.chatbridgevelocity.chat.Command;
 import cn.fsp.chatbridgevelocity.chat.qq.GoCQHttpSendGroupMsg;
 import cn.fsp.chatbridgevelocity.chat.qq.QQChat;
 import com.google.gson.JsonObject;
@@ -48,7 +49,7 @@ public class GoCQHttpHandler extends Handler{
                     return;
                 }
                 boolean permission = hasPermission(sender.get("role").getAsString());
-                Util.chatSync(message, permission, this.qqChat, this.message);
+                Command.chatSync(message, permission, this.qqChat, this.message);
             }
         }
     }
