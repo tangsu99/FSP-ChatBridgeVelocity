@@ -175,10 +175,13 @@ public class ChatForward {
         }
         String playerName = event.getPlayer().getUsername();
         if (event.getResult().isAllowed()) {
+            String s = new MessageFormat(config.getQQJoinFormat()).format(new String[]{playerName});
+            if (kookChatEnabled) {
+                sendKookMsg(s);
+            }
             if (getTimestamp(playerName)) {
-                MessageFormat str = new MessageFormat(config.getQQJoinFormat());
                 if (qqChatEnabled) {
-                    qqChat.sendMessage(str.format(new String[]{playerName}), String.valueOf(event.hashCode()));
+                    qqChat.sendMessage(s, String.valueOf(event.hashCode()));
                 }
             }
         }
@@ -240,17 +243,20 @@ public class ChatForward {
 
     public StringBuilder getOnline() {
         StringBuilder sb = new StringBuilder();
-        RegisteredServer ser;
         if (server.getAllPlayers().size() == 0) {
             sb.append("当前没有玩家在线");
             return sb;
         }
         for (String sl : config.getServerList()) {
-            ser = server.getServer(sl).get();
+            if (server.getServer(sl).isEmpty()) {
+                continue;
+            }
+            RegisteredServer ser = server.getServer(sl).get();
             if (ser.getPlayersConnected().size() == 0) {
                 continue;
             }
-            sb.append(server.getServer(sl).get().getServerInfo().getName()).append(" online:\n");
+
+            sb.append(sl).append(" online:\n");
             for (Player player : ser.getPlayersConnected()) {
                 sb.append("- ").append(player.getUsername()).append("\n");
             }

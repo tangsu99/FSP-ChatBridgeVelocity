@@ -13,7 +13,7 @@ public class ChannelMsgBody {
         return "{\"type\": 1, \"target_id\": \"Channel\", \"content\":\"Message\"}"
                 .replaceAll("Channel", c)
                 .replaceAll("Message", s)
-                .toString();
+                .replaceAll("\\n", "\\\\n");
 //        return JsonUtil.gson.toJson(new ChannelMsgBody());
     }
 }
