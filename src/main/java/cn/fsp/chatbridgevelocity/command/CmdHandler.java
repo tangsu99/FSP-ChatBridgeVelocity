@@ -27,4 +27,9 @@ public class CmdHandler {
         commandSourceCommandContext.getSource().sendMessage(Component.text("Reload done!"));
         return 1;
     }
+
+    public int status(CommandContext<CommandSource> commandSourceCommandContext) {
+        commandSourceCommandContext.getSource().sendMessage(Component.text("Reload done!"));
+        return 1;
+    }
 }

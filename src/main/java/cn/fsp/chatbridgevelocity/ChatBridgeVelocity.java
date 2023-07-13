@@ -1,6 +1,7 @@
 package cn.fsp.chatbridgevelocity;
 
 import cn.fsp.chatbridgevelocity.chat.ChatForward;
+import cn.fsp.chatbridgevelocity.chat.Status;
 import cn.fsp.chatbridgevelocity.chat.kook.API.ChannelMessage;
 import cn.fsp.chatbridgevelocity.chat.kook.API.Gateway;
 import cn.fsp.chatbridgevelocity.chat.kook.KookClient;
@@ -20,7 +21,6 @@ import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.concurrent.TimeUnit;
 
 @Plugin(
         id = "chatbridgevelocity",
@@ -39,7 +39,7 @@ public class ChatBridgeVelocity {
     public Injector injector;
     @Inject
     public ProxyServer server;
-    public Config config;
+    public static Config config;
     public ChatForward chatForward;
     private SocketServer socketServer;
     private Gateway gateway;
@@ -49,6 +49,7 @@ public class ChatBridgeVelocity {
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
         config = new Config();
+        Status.init();
         socketServer = new SocketServer(this);
         chatForward = new ChatForward(this);
         try {
@@ -70,7 +71,7 @@ public class ChatBridgeVelocity {
     }
 
     private void kook() {
-        if (!config.getKookEnabled()) {
+        if (!Status.kookChatStatus) {
             logger.info("kook聊天互通已禁用");
             return;
         }
@@ -88,5 +89,6 @@ public class ChatBridgeVelocity {
     public void reload() {
         config.reLoadConfig();
         chatForward.reload();
+        kookClient._reconnect();
     }
 }

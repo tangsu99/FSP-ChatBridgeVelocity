@@ -9,7 +9,6 @@ import cn.fsp.chatbridgevelocity.chat.qq.handler.MiraiHandler;
 import cn.fsp.chatbridgevelocity.config.Config;
 import cn.fsp.chatbridgevelocity.event.KookMessageEvent;
 import cn.fsp.chatbridgevelocity.event.SocketEvent;
-import com.velocitypowered.api.event.connection.ConnectionHandshakeEvent;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.player.PlayerChatEvent;
@@ -30,12 +29,10 @@ public class ChatForward {
     public ProxyServer server;
     public Logger logger;
     Map<String, String> playerCurrentServer = new HashMap<>();
-    private Map<String, Long> Timestamp = new HashMap<>();
+    private final Map<String, Long> Timestamp = new HashMap<>();
     public Config config;
     public QQChat qqChat;
     private long CD;
-    private boolean ChatForwardEnabled;
-    private boolean qqChatEnabled;
     private boolean kookChatEnabled;
     public ChatBridgeVelocity plugin;
 
@@ -45,11 +42,9 @@ public class ChatForward {
         this.logger = plugin.logger;
         this.config = plugin.config;
         this.CD = config.getCD() * 1000;
-        this.ChatForwardEnabled = config.ChatForwardEnabled();
-        this.qqChatEnabled = config.getQQChatEnabled();
         this.kookChatEnabled = config.getKookEnabled();
         // qq 互通
-        if (qqChatEnabled) {
+        if (Status.qqChatStatus) {
             connect();
         }else {
             logger.info("QQ聊天互通已禁用");
@@ -87,7 +82,7 @@ public class ChatForward {
 
     @Subscribe
     public void onPlayerChatEvent(PlayerChatEvent event) {
-        if (!this.ChatForwardEnabled) {
+        if (!Status.ChatForwardStatus) {
             return;
         }
         String currentServerName = event.getPlayer().getCurrentServer().orElseThrow().getServer().getServerInfo().getName();
@@ -100,7 +95,7 @@ public class ChatForward {
                 message += "\t[chatSync]";
             }
             MessageFormat str = new MessageFormat(config.getQQMessageFormat());
-            if (qqChatEnabled) {
+            if (Status.qqChatStatus) {
                 qqChat.sendMessage(str.format(new String[]{currentServerName, playerName, message}), String.valueOf(event.hashCode()));
             }
         }
@@ -121,7 +116,7 @@ public class ChatForward {
 
     @Subscribe
     public void onServerConnectedEvent(ServerConnectedEvent event) {
-        if (!this.ChatForwardEnabled) {
+        if (!Status.ChatForwardStatus) {
             return;
         }
         String previousServer;
@@ -151,7 +146,7 @@ public class ChatForward {
 
     @Subscribe
     public void onDisconnectEvent(DisconnectEvent event) {
-        if (!this.ChatForwardEnabled) {
+        if (!Status.ChatForwardStatus) {
             return;
         }
         String playerName = event.getPlayer().getUsername();
@@ -180,7 +175,7 @@ public class ChatForward {
                 sendKookMsg(s);
             }
             if (getTimestamp(playerName)) {
-                if (qqChatEnabled) {
+                if (Status.qqChatStatus) {
                     qqChat.sendMessage(s, String.valueOf(event.hashCode()));
                 }
             }
@@ -232,7 +227,7 @@ public class ChatForward {
         for (Player player : server.getAllPlayers()) {
             player.sendMessage(Component.text(s).color(NamedTextColor.GRAY));
         }
-        if (qqChatEnabled) {
+        if (Status.qqChatStatus) {
             qqChat.sendMessage(s, "Velocity");
         }
         if (kookChatEnabled) {
@@ -328,13 +323,5 @@ public class ChatForward {
 
     public void sendKookMsg(String s) {
         ChatBridgeVelocity.channelMessage.sendMessage(ChannelMsgBody.msgBody(config.getKookChannelID(), s));
-    }
-
-    public void setQQChatEnabled(boolean e) {
-        this.qqChatEnabled = e;
-    }
-
-    public void setKookChatEnabled(boolean e) {
-        this.kookChatEnabled = e;
     }
 }

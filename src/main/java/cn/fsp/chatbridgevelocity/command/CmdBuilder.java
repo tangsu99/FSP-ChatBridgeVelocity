@@ -13,6 +13,7 @@ public class CmdBuilder {
         LiteralCommandNode<CommandSource> cmdNode = LiteralArgumentBuilder
                 .<CommandSource>literal("cbv").executes(cmdHandler::help)
                 .then(LiteralArgumentBuilder.<CommandSource>literal("reload").executes(cmdHandler::reload))
+                .then(LiteralArgumentBuilder.<CommandSource>literal("status").executes(cmdHandler::status))
                 .build();
         return new BrigadierCommand(cmdNode);
     }

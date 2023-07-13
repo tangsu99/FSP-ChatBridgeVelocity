@@ -1,6 +1,7 @@
 package cn.fsp.chatbridgevelocity.chat.qq;
 
 import cn.fsp.chatbridgevelocity.chat.ChatForward;
+import cn.fsp.chatbridgevelocity.chat.Status;
 import cn.fsp.chatbridgevelocity.chat.qq.handler.Handler;
 import cn.fsp.chatbridgevelocity.config.Config;
 import com.google.gson.Gson;
@@ -40,6 +41,9 @@ public class QQChat extends WebSocketClient {
     public void onOpen(ServerHandshake serverHandshake) {
         logger.info("QQ 已连接");
         startConnTask();
+        if (isOpen()) {
+            Status.qqChatStatus = true;
+        }
     }
 
     @Override
@@ -49,14 +53,14 @@ public class QQChat extends WebSocketClient {
 
     @Override
     public void onClose(int i, String s, boolean b) {
-        chatForward.setQQChatEnabled(false);
+        Status.qqChatStatus = false;
         connTask.cancel();
     }
 
     @Override
     public void onError(Exception e) {
         logger.error("连接异常");
-        chatForward.setQQChatEnabled(false);
+        Status.qqChatStatus = false;
     }
 
     public void sendMessage(String msg, String echo) {
@@ -67,7 +71,7 @@ public class QQChat extends WebSocketClient {
             return;
         }
         logger.info("连接异常，信息发送失败");
-        chatForward.setQQChatEnabled(false);
+        Status.qqChatStatus = true;
     }
 
     public void setSync(boolean b) {

@@ -1,6 +1,7 @@
 package cn.fsp.chatbridgevelocity.chat.kook;
 
 import cn.fsp.chatbridgevelocity.ChatBridgeVelocity;
+import cn.fsp.chatbridgevelocity.chat.Status;
 import cn.fsp.chatbridgevelocity.chat.kook.signaling.Hello;
 import cn.fsp.chatbridgevelocity.chat.kook.signaling.Ping;
 import cn.fsp.chatbridgevelocity.chat.kook.util.JsonUtil;
@@ -70,14 +71,14 @@ public class KookClient extends WebSocketClient {
 
     @Override
     public void onClose(int code, String reason, boolean remote) {
-        plugin.chatForward.setKookChatEnabled(false);
+        Status.kookChatStatus = false;
         connTask.cancel();
     }
 
     @Override
     public void onError(Exception ex) {
         plugin.logger.error("连接异常");
-        plugin.chatForward.setQQChatEnabled(false);
+        Status.kookChatStatus = false;
     }
 
     public void startPing() {
@@ -110,11 +111,6 @@ public class KookClient extends WebSocketClient {
     }
 
     private void msgEvent(String server, String channel, String sender, String message) {
-//        plugin.server.getScheduler().buildTask(plugin, () -> {
-//
-//        })
-//                .delay(0L, TimeUnit.SECONDS)
-//                .schedule();
         plugin.server.getEventManager().fire(new KookMessageEvent(server, channel, sender, message));
     }
 
@@ -128,6 +124,9 @@ public class KookClient extends WebSocketClient {
     public void _reconnect() {
         uri = URIUtil.createURI(getURI() + "&resume=1&sn=" + sn + "&session_id=" + sessionId);
         reconnect();
+        if (isOpen()) {
+            Status.kookChatStatus = true;
+        }
     }
 
     public void startConnTask() {

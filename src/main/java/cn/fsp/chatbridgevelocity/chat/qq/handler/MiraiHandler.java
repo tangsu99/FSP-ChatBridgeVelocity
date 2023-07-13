@@ -2,6 +2,7 @@ package cn.fsp.chatbridgevelocity.chat.qq.handler;
 
 import cn.fsp.chatbridgevelocity.chat.ChatForward;
 import cn.fsp.chatbridgevelocity.chat.Command;
+import cn.fsp.chatbridgevelocity.chat.Status;
 import cn.fsp.chatbridgevelocity.chat.qq.MiraiSendGroupMsg;
 import cn.fsp.chatbridgevelocity.chat.qq.QQChat;
 import com.google.gson.JsonArray;
@@ -73,6 +74,12 @@ public class MiraiHandler extends Handler{
             case "!!ping":
                 qqChat.sendMessage("pong!!", "pong");
                 break;
+            case "!!help":
+                qqChat.sendMessage("FSP-ChatBridgeVelocity\n!!help\t显示此信息\n!!mc\t发送信息到mc\n!!chatSync on/off\t聊天同步\n!!online\t显示在线玩家\n!!ping\tpong!!", "help");
+                break;
+            case "status":
+                qqChat.sendMessage(Status.isOnline(),"status");
+                break;
         }
 //        if (message.equals("!!online")) {
 //            qqChat.sendMessage(chatForward.getOnline().toString(), "online");
@@ -80,9 +87,9 @@ public class MiraiHandler extends Handler{
 //        if (message.equals("!!ping")) {
 //            qqChat.sendMessage("pong!!", "pong");
 //        }
-        if (message.equals("!!help")) {
-            qqChat.sendMessage("FSP-ChatBridgeVelocity\n!!help\t显示此信息\n!!mc\t发送信息到mc\n!!chatSync on/off\t聊天同步\n!!online\t显示在线玩家\n!!ping\tpong!!", "help");
-        }
+//        if (message.equals("!!help")) {
+//            qqChat.sendMessage("FSP-ChatBridgeVelocity\n!!help\t显示此信息\n!!mc\t发送信息到mc\n!!chatSync on/off\t聊天同步\n!!online\t显示在线玩家\n!!ping\tpong!!", "help");
+//        }
         Command.chatSync(message, permission, this.qqChat, this.message);
     }
 

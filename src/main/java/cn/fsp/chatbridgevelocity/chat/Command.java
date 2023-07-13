@@ -2,6 +2,7 @@ package cn.fsp.chatbridgevelocity.chat;
 
 import cn.fsp.chatbridgevelocity.chat.message.Message;
 import cn.fsp.chatbridgevelocity.chat.qq.QQChat;
+import cn.fsp.chatbridgevelocity.chat.qq.handler.Handler;
 
 public class Command {
     public static void chatSync(String command, boolean permission, QQChat qqChat, Message message){
