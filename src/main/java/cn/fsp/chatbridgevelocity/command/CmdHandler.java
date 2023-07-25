@@ -1,6 +1,7 @@
 package cn.fsp.chatbridgevelocity.command;
 
 import cn.fsp.chatbridgevelocity.ChatBridgeVelocity;
+import cn.fsp.chatbridgevelocity.chat.Status;
 import com.mojang.brigadier.context.CommandContext;
 import com.velocitypowered.api.command.CommandSource;
 import net.kyori.adventure.text.Component;
@@ -29,7 +30,7 @@ public class CmdHandler {
     }
 
     public int status(CommandContext<CommandSource> commandSourceCommandContext) {
-        commandSourceCommandContext.getSource().sendMessage(Component.text("Reload done!"));
+        commandSourceCommandContext.getSource().sendMessage(Component.text(Status.isOnline()));
         return 1;
     }
 }

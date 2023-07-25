@@ -77,7 +77,7 @@ public class MiraiHandler extends Handler{
             case "!!help":
                 qqChat.sendMessage("FSP-ChatBridgeVelocity\n!!help\t显示此信息\n!!mc\t发送信息到mc\n!!chatSync on/off\t聊天同步\n!!online\t显示在线玩家\n!!ping\tpong!!", "help");
                 break;
-            case "status":
+            case "!!status":
                 qqChat.sendMessage(Status.isOnline(),"status");
                 break;
         }

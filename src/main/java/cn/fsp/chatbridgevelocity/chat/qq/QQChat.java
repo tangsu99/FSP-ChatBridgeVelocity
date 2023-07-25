@@ -16,7 +16,6 @@ import java.net.URI;
 import java.util.concurrent.TimeUnit;;
 
 public class QQChat extends WebSocketClient {
-    private Gson gson = new GsonBuilder().create();
     private ChatForward chatForward;
     private ProxyServer server;
     private Logger logger;
@@ -71,7 +70,7 @@ public class QQChat extends WebSocketClient {
             return;
         }
         logger.info("连接异常，信息发送失败");
-        Status.qqChatStatus = true;
+        Status.qqChatStatus = false;
     }
 
     public void setSync(boolean b) {
@@ -85,6 +84,7 @@ public class QQChat extends WebSocketClient {
         connTask = server.getScheduler().buildTask(
                 chatForward.plugin, () -> {
                     if (!isOpen()) {
+                        logger.info("尝试重新连接。。");
                         reconnect();
                     }
                 })
