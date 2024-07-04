@@ -1,4 +1,4 @@
-package cn.fsp.chatbridgevelocity.chat.kook.util;
+package cn.fsp.chatbridgevelocity.chat.util;
 
 import java.net.URI;
 

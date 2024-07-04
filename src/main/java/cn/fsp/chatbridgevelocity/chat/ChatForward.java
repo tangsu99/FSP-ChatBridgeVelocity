@@ -1,8 +1,8 @@
 package cn.fsp.chatbridgevelocity.chat;
 
 import cn.fsp.chatbridgevelocity.ChatBridgeVelocity;
-import cn.fsp.chatbridgevelocity.chat.kook.util.ChannelMsgBody;
-import cn.fsp.chatbridgevelocity.chat.kook.util.URIUtil;
+import cn.fsp.chatbridgevelocity.chat.util.ChannelMsgBody;
+import cn.fsp.chatbridgevelocity.chat.util.URIUtil;
 import cn.fsp.chatbridgevelocity.chat.qq.QQChat;
 import cn.fsp.chatbridgevelocity.chat.qq.handler.GoCQHttpHandler;
 import cn.fsp.chatbridgevelocity.chat.qq.handler.MiraiHandler;

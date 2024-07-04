@@ -1,4 +1,4 @@
-package cn.fsp.chatbridgevelocity.chat.kook.util;
+package cn.fsp.chatbridgevelocity.chat.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
