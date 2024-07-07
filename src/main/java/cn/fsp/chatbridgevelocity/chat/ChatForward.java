@@ -88,15 +88,17 @@ public class ChatForward {
         String currentServerName = event.getPlayer().getCurrentServer().orElseThrow().getServer().getServerInfo().getName();
         String playerName = event.getPlayer().getUsername();
         String message = event.getMessage();
-        if (message.startsWith(config.getMCRespondPrefix()) || qqChat.getSync()) {
-            if (!qqChat.getSync()) {
-                message = message.substring(4).trim();
-            }else {
-                message += "\t[chatSync]";
-            }
-            MessageFormat str = new MessageFormat(config.getQQMessageFormat());
-            if (Status.qqChatStatus) {
-                qqChat.sendMessage(str.format(new String[]{currentServerName, playerName, message}), String.valueOf(event.hashCode()));
+        if (qqChat != null) {
+            if (message.startsWith(config.getMCRespondPrefix()) || qqChat.getSync()) {
+                if (!qqChat.getSync()) {
+                    message = message.substring(4).trim();
+                } else {
+                    message += "\t[chatSync]";
+                }
+                MessageFormat str = new MessageFormat(config.getQQMessageFormat());
+                if (Status.qqChatStatus) {
+                    qqChat.sendMessage(str.format(new String[]{currentServerName, playerName, message}), String.valueOf(event.hashCode()));
+                }
             }
         }
         for (RegisteredServer server1 : server.getAllServers()) {
