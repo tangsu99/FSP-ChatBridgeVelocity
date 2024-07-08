@@ -33,26 +33,6 @@ public class SocketServer implements Runnable {
         }
     }
     public void startListener() throws IOException {
-//        plugin.server.getScheduler()
-//                .buildTask(plugin, () -> {
-//                    // do stuff here
-//                    while (start) {
-//                        try {
-//                            Socket s = serverSocket.accept();
-//                            BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream()));
-//                            //读取客户端发送来的消息
-//                            String mess = br.readLine();
-////                            chatForward.serverPacketEvent(mess.toCharArray()[0], mess.substring(1).trim());
-//                            plugin.server.getEventManager().fire(new SocketEvent(mess.toCharArray()[0], mess.substring(1).trim())).thenAccept((event) -> {
-//                                // event has finished firing
-//                                // do some logic dependent on the result
-//                            });
-//                        } catch (IOException e) {
-////                        throw new RuntimeException(e);
-//                        }
-//                    }
-//                })
-//                .schedule();
         server.getScheduler().buildTask(plugin, this).schedule();
         plugin.logger.info("Listener started");
     }
