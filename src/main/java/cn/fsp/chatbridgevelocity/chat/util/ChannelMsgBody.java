@@ -1,4 +1,4 @@
-package cn.fsp.chatbridgevelocity.chat.kook.util;
+package cn.fsp.chatbridgevelocity.chat.util;
 
 public class ChannelMsgBody {
     public int type = 0;

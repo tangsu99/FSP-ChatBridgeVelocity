@@ -1,7 +1,7 @@
 package cn.fsp.chatbridgevelocity.chat.kook.API;
 
-import cn.fsp.chatbridgevelocity.chat.kook.util.JsonUtil;
-import cn.fsp.chatbridgevelocity.chat.kook.util.URIUtil;
+import cn.fsp.chatbridgevelocity.chat.util.JsonUtil;
+import cn.fsp.chatbridgevelocity.chat.util.URIUtil;
 import com.google.gson.JsonObject;
 
 import java.io.IOException;

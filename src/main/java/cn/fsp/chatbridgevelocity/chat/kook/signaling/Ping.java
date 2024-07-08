@@ -1,7 +1,7 @@
 package cn.fsp.chatbridgevelocity.chat.kook.signaling;
 
 import cn.fsp.chatbridgevelocity.chat.kook.KookClient;
-import cn.fsp.chatbridgevelocity.chat.kook.util.TimeUtil;
+import cn.fsp.chatbridgevelocity.chat.util.TimeUtil;
 
 public class Ping implements Runnable{
     private boolean Timeout;

@@ -1,8 +1,8 @@
 package cn.fsp.chatbridgevelocity.chat;
 
 import cn.fsp.chatbridgevelocity.ChatBridgeVelocity;
-import cn.fsp.chatbridgevelocity.chat.kook.util.ChannelMsgBody;
-import cn.fsp.chatbridgevelocity.chat.kook.util.URIUtil;
+import cn.fsp.chatbridgevelocity.chat.util.ChannelMsgBody;
+import cn.fsp.chatbridgevelocity.chat.util.URIUtil;
 import cn.fsp.chatbridgevelocity.chat.qq.QQChat;
 import cn.fsp.chatbridgevelocity.chat.qq.handler.GoCQHttpHandler;
 import cn.fsp.chatbridgevelocity.chat.qq.handler.MiraiHandler;
@@ -88,15 +88,17 @@ public class ChatForward {
         String currentServerName = event.getPlayer().getCurrentServer().orElseThrow().getServer().getServerInfo().getName();
         String playerName = event.getPlayer().getUsername();
         String message = event.getMessage();
-        if (message.startsWith(config.getMCRespondPrefix()) || qqChat.getSync()) {
-            if (!qqChat.getSync()) {
-                message = message.substring(4).trim();
-            }else {
-                message += "\t[chatSync]";
-            }
-            MessageFormat str = new MessageFormat(config.getQQMessageFormat());
-            if (Status.qqChatStatus) {
-                qqChat.sendMessage(str.format(new String[]{currentServerName, playerName, message}), String.valueOf(event.hashCode()));
+        if (qqChat != null) {
+            if (message.startsWith(config.getMCRespondPrefix()) || qqChat.getSync()) {
+                if (!qqChat.getSync()) {
+                    message = message.substring(4).trim();
+                } else {
+                    message += "\t[chatSync]";
+                }
+                MessageFormat str = new MessageFormat(config.getQQMessageFormat());
+                if (Status.qqChatStatus) {
+                    qqChat.sendMessage(str.format(new String[]{currentServerName, playerName, message}), String.valueOf(event.hashCode()));
+                }
             }
         }
         for (RegisteredServer server1 : server.getAllServers()) {
@@ -205,7 +207,7 @@ public class ChatForward {
         server.getAllPlayers().forEach(
                 player -> player.sendMessage((event.getStatus() == 49) ? serverStarted(event.getServerName()) : serverStopped(event.getServerName()))
         );
-        logger.info((event.getStatus() == 49) ? (event.getServerName() + "Started!") : (event.getServerName() + "Stopped!"));
+        logger.info((event.getStatus() == 49) ? (event.getServerName() + " Started!") : (event.getServerName() + " Stopped!"));
     }
 
     public void allPlayerSendMessage(String name, String msg) {
