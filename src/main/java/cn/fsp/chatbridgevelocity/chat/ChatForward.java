@@ -207,7 +207,7 @@ public class ChatForward {
         server.getAllPlayers().forEach(
                 player -> player.sendMessage((event.getStatus() == 49) ? serverStarted(event.getServerName()) : serverStopped(event.getServerName()))
         );
-        logger.info((event.getStatus() == 49) ? (event.getServerName() + "Started!") : (event.getServerName() + "Stopped!"));
+        logger.info((event.getStatus() == 49) ? (event.getServerName() + " Started!") : (event.getServerName() + " Stopped!"));
     }
 
     public void allPlayerSendMessage(String name, String msg) {
