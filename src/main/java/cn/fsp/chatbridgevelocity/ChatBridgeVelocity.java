@@ -6,7 +6,6 @@ import cn.fsp.chatbridgevelocity.chat.kook.API.ChannelMessage;
 import cn.fsp.chatbridgevelocity.chat.kook.API.Gateway;
 import cn.fsp.chatbridgevelocity.chat.kook.KookClient;
 import cn.fsp.chatbridgevelocity.command.CmdBuilder;
-import cn.fsp.chatbridgevelocity.command.CommandReg;
 import cn.fsp.chatbridgevelocity.config.Config;
 import cn.fsp.chatbridgevelocity.serverPacket.SocketServer;
 import com.google.inject.Inject;
@@ -61,7 +60,6 @@ public class ChatBridgeVelocity {
         kook();
         server.getEventManager().register(this, chatForward);
         commandManager.register(injector.getInstance(CmdBuilder.class).register(this));
-        CommandReg.regCommand(commandManager, this);
     }
 
     @Subscribe
