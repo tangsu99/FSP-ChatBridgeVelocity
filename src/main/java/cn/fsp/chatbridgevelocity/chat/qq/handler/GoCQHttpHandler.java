@@ -5,6 +5,7 @@ import cn.fsp.chatbridgevelocity.chat.Command;
 import cn.fsp.chatbridgevelocity.chat.Status;
 import cn.fsp.chatbridgevelocity.chat.qq.GoCQHttpSendGroupMsg;
 import cn.fsp.chatbridgevelocity.chat.qq.QQChat;
+import cn.fsp.chatbridgevelocity.chat.util.QQSender;
 import com.google.gson.JsonObject;
 
 public class GoCQHttpHandler extends Handler{
@@ -37,6 +38,7 @@ public class GoCQHttpHandler extends Handler{
                     chatForward.allPlayerSendMessage(name, msg);
                     return;
                 }
+                sendEvent(jsonObject.get("group_id").getAsString(), new QQSender(name, name, sender.get("role").getAsString(), ""), message);
                 switch (message) {
                     case "!!online":
                         qqChat.sendMessage(chatForward.getOnline().toString(), "online");
