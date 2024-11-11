@@ -3,7 +3,9 @@ package cn.fsp.chatbridgevelocity.chat.qq.handler;
 import cn.fsp.chatbridgevelocity.chat.ChatForward;
 import cn.fsp.chatbridgevelocity.chat.message.Message;
 import cn.fsp.chatbridgevelocity.chat.qq.QQChat;
+import cn.fsp.chatbridgevelocity.chat.util.QQSender;
 import cn.fsp.chatbridgevelocity.config.Config;
+import cn.fsp.chatbridgevelocity.event.QQMessageEvent;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.velocitypowered.api.proxy.ProxyServer;
@@ -30,4 +32,7 @@ public abstract class Handler {
 
     public abstract void exec(String s);
     public abstract String send(String group, String msg);
+    protected void sendEvent(String group, QQSender sender, String msg) {
+        chatForward.plugin.server.getEventManager().fire(new QQMessageEvent(group, sender, msg));
+    }
 }
