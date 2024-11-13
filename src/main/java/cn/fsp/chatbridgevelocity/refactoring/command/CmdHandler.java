@@ -1,4 +1,4 @@
-package cn.fsp.chatbridgevelocity.command;
+package cn.fsp.chatbridgevelocity.refactoring.command;
 
 import cn.fsp.chatbridgevelocity.ChatBridgeVelocity;
 import cn.fsp.chatbridgevelocity.chat.Status;

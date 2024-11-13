@@ -1,4 +1,4 @@
-package cn.fsp.chatbridgevelocity.config;
+package cn.fsp.chatbridgevelocity.refactoring.config;
 
 public class ConfigStorage {
     boolean chatForwardEnabled = true;

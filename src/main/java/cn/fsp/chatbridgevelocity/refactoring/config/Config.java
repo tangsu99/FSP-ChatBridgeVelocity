@@ -1,4 +1,4 @@
-package cn.fsp.chatbridgevelocity.config;
+package cn.fsp.chatbridgevelocity.refactoring.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

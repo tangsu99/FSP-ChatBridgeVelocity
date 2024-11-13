@@ -1,8 +1,7 @@
-package cn.fsp.chatbridgevelocity.command;
+package cn.fsp.chatbridgevelocity.refactoring.command;
 
 import cn.fsp.chatbridgevelocity.ChatBridgeVelocity;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.velocitypowered.api.command.BrigadierCommand;
 import com.velocitypowered.api.command.CommandSource;

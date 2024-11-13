@@ -1,4 +1,4 @@
-package cn.fsp.chatbridgevelocity.event;
+package cn.fsp.chatbridgevelocity.refactoring.event;
 
 import cn.fsp.chatbridgevelocity.chat.util.QQSender;
 
