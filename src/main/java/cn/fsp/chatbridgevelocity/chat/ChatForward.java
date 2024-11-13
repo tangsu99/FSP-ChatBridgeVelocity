@@ -192,8 +192,8 @@ public class ChatForward {
         }
         // online 指令
         if (event.getMessage().startsWith("!!online")) {
-            ChatBridgeVelocity.channelMessage.sendMessage(
-                    ChannelMsgBody.msgBody(event.getChannel(), getOnline().toString()));
+//            ChatBridgeVelocity.channelMessage.sendMessage(
+//                    ChannelMsgBody.msgBody(event.getChannel(), getOnline().toString()));
             return;
         }
         // 只转发指定频道的消息
@@ -324,6 +324,6 @@ public class ChatForward {
     }
 
     public void sendKookMsg(String s) {
-        ChatBridgeVelocity.channelMessage.sendMessage(ChannelMsgBody.msgBody(config.getKookChannelID(), s));
+//        ChatBridgeVelocity.channelMessage.sendMessage(ChannelMsgBody.msgBody(config.getKookChannelID(), s));
     }
 }
