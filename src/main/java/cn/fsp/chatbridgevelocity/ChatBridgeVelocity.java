@@ -1,8 +1,8 @@
 package cn.fsp.chatbridgevelocity;
 
-import cn.fsp.chatbridgevelocity.command.CmdBuilder;
+import cn.fsp.chatbridgevelocity.refactoring.command.CmdBuilder;
 import cn.fsp.chatbridgevelocity.refactoring.config.Config;
-import cn.fsp.chatbridgevelocity.serverPacket.SocketServer;
+import cn.fsp.chatbridgevelocity.refactoring.serverPacket.SocketServer;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.velocitypowered.api.command.CommandManager;

@@ -109,9 +109,9 @@ public class ChatForward {
             }
         }
         if (kookChatEnabled) {
-            ChatBridgeVelocity.channelMessage.sendMessage(
-                    ChannelMsgBody.msgBody(
-                            config.getKookChannelID(), "[" + currentServerName + "]<" + playerName + "> " + message));
+//            ChatBridgeVelocity.channelMessage.sendMessage(
+//                    ChannelMsgBody.msgBody(
+//                            config.getKookChannelID(), "[" + currentServerName + "]<" + playerName + "> " + message));
         }
         logger.info("[" + currentServerName + "]<" + playerName + "> " + message);
     }
