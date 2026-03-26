@@ -25,6 +25,12 @@ import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @deprecated 该类已废弃，请使用 ChatEventHandler 和 StatusManager
+ * ChatForward 将在后续版本中被移除
+ * 新的架构提供了更好的关注点分离和可测试性
+ */
+@Deprecated(since = "0.5.2", forRemoval = true)
 public class ChatForward {
     public ProxyServer server;
     public Logger logger;
@@ -60,24 +66,15 @@ public class ChatForward {
     }
 
     private void goCQHttp() {
-//        try {
-//            uri1 = new URI("ws://" + config.getHost() + ":" + config.getPort() + "/");
-//        } catch (URISyntaxException e) {
-//            throw new RuntimeException(e);
-//        }
-        qqChat = new QQChat(URIUtil.createURI("ws://" + config.getHost() + ":" + config.getPort() + "/"), this, new GoCQHttpHandler(this));
-        qqChat.addHeader("Authorization", "Bearer " + config.getToken());
-        qqChat.connect();
+        // 已废弃 - 此方法不再使用
+        // 请使用 ChatBridgeVelocity.initializePlatforms() 方法初始化QQ平台
+        logger.warn("ChatForward.goCQHttp() 已废弃，请使用新的架构");
     }
 
     private void Mirai() {
-//        try {
-//            uri1 = new URI("ws://" + config.getHost() + ":" + config.getPort() + "/all?verifyKey=" + config.getToken() + "&qq=" + config.getBotQQ());
-//        } catch (URISyntaxException e) {
-//            throw new RuntimeException(e);
-//        }
-        qqChat = new QQChat(URIUtil.createURI("ws://" + config.getHost() + ":" + config.getPort() + "/all?verifyKey=" + config.getToken() + "&qq=" + config.getBotQQ()), this, new MiraiHandler(this));
-        qqChat.connect();
+        // 已废弃 - 此方法不再使用
+        // 请使用 ChatBridgeVelocity.initializePlatforms() 方法初始化QQ平台
+        logger.warn("ChatForward.Mirai() 已废弃，请使用新的架构");
     }
 
     @Subscribe

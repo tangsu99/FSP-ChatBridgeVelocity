@@ -1,73 +1,92 @@
 package cn.fsp.chatbridgevelocity.chat.qq.handler;
 
-import cn.fsp.chatbridgevelocity.chat.ChatForward;
-import cn.fsp.chatbridgevelocity.chat.Command;
-import cn.fsp.chatbridgevelocity.chat.Status;
+import cn.fsp.chatbridgevelocity.chat.Constants;
 import cn.fsp.chatbridgevelocity.chat.qq.GoCQHttpSendGroupMsg;
-import cn.fsp.chatbridgevelocity.chat.qq.QQChat;
+import cn.fsp.chatbridgevelocity.chat.qq.command.QQCommandHandler;
 import cn.fsp.chatbridgevelocity.chat.util.QQSender;
+import cn.fsp.chatbridgevelocity.refactoring.config.Config;
+import cn.fsp.chatbridgevelocity.refactoring.event.QQMessageEvent;
 import com.google.gson.JsonObject;
+import com.velocitypowered.api.proxy.ProxyServer;
+import org.slf4j.Logger;
 
-public class GoCQHttpHandler extends Handler{
-    public GoCQHttpHandler(ChatForward chatForward) {
-        super(chatForward);
-    }
+/**
+ * Go-CQHTTP机器人框架处理器
+ * 负责处理来自Go-CQHTTP框架的QQ消息
+ */
+public class GoCQHttpHandler extends Handler {
+    private final QQCommandHandler commandHandler;
 
-    public void setQQChat(QQChat qqChat) {
-        this.qqChat = qqChat;
+    public GoCQHttpHandler(ProxyServer server, Logger logger, Config config) {
+        super(server, logger, config);
+        this.commandHandler = new QQCommandHandler(null, message, logger);
     }
 
     @Override
-    public void exec(String s) {
-        JsonObject jsonObject = gson.fromJson(s, JsonObject.class);
-        if (!jsonObject.has("message_type")) {
+    public void exec(String json) {
+        try {
+            JsonObject jsonObject = gson.fromJson(json, JsonObject.class);
+            if (!jsonObject.has("message_type")) {
+                return;
+            }
+
+            if ("group".equals(jsonObject.get("message_type").getAsString())) {
+                handleGroupMessage(jsonObject);
+            }
+        } catch (Exception e) {
+            logger.error("Error processing GoCQHttp message", e);
+        }
+    }
+
+    private void handleGroupMessage(JsonObject jsonObject) {
+        String groupId = jsonObject.get("group_id").getAsString();
+        if (!groupId.equals(config.getQQGroup())) {
             return;
         }
-        if (jsonObject.get("message_type").getAsString().equals("group")) {
-            if (jsonObject.get("group_id").getAsString().equals(config.getQQGroup())) {
-                String message = jsonObject.get("message").getAsString();
-                JsonObject sender = jsonObject.get("sender").getAsJsonObject();
-                String name = getName(sender);
-                if (message.startsWith(config.getQQRespondPrefix()) || qqChat.getSync()) {
-                    String msg;
-                    if (qqChat.getSync()) {
-                        msg = message + "    [chatSync]";
-                    }else {
-                        msg = message.substring(4).trim();
-                    }
-                    chatForward.allPlayerSendMessage(name, msg);
-                    return;
-                }
-                sendEvent(jsonObject.get("group_id").getAsString(), new QQSender(name, name, sender.get("role").getAsString(), ""), message);
-                switch (message) {
-                    case "!!online":
-                        qqChat.sendMessage(chatForward.getOnline().toString(), "online");
-                        break;
-                    case "!!ping":
-                        qqChat.sendMessage("pong!!", "pong");
-                        break;
-                    case "!!help":
-                        qqChat.sendMessage("FSP-ChatBridgeVelocity\n!!help\t显示此信息\n!!mc\t发送信息到mc\n!!chatSync on/off\t聊天同步\n!!online\t显示在线玩家\n!!ping\tpong!!", "help");
-                        break;
-                    case "status":
-                        qqChat.sendMessage(Status.isOnline(),"status");
-                        break;
-                }
-//                if (message.equals("!!online")) {
-//                    qqChat.sendMessage(chatForward.getOnline().toString(), "online");
-//                    return;
-//                }
-//                if (message.equals("!!ping")) {
-//                    qqChat.sendMessage("pong!!", "pong");
-//                    return;
-//                }
-//                if (message.equals("!!help")) {
-//                    qqChat.sendMessage("FSP-ChatBridgeVelocity\n!!help\t显示此信息\n!!mc\t发送信息到mc\n!!chatSync on/off\t聊天同步\n!!online\t显示在线玩家\n!!ping\tpong!!", "help");
-//                    return;
-//                }
-                boolean permission = hasPermission(sender.get("role").getAsString());
-                Command.chatSync(message, permission, this.qqChat, this.message);
+
+        String messageText = jsonObject.get("message").getAsString();
+        JsonObject sender = jsonObject.get("sender").getAsJsonObject();
+        String senderName = getName(sender);
+        String senderRole = sender.get("role").getAsString();
+
+        // 处理聊天同步前缀
+        if (messageText.startsWith(config.getQQRespondPrefix()) || qqChat.getSync()) {
+            String processedMsg;
+            if (qqChat.getSync()) {
+                processedMsg = messageText + "    " + Constants.CHAT_SYNC_FLAG;
+            } else {
+                processedMsg = messageText.substring(config.getQQRespondPrefix().length()).trim();
             }
+            // 广播到游戏内
+            fireMessageEvent(groupId, senderName, processedMsg);
+            return;
+        }
+
+        // 处理特殊命令
+        handleSpecialCommands(messageText);
+
+        // 处理权限相关命令
+        boolean hasPermission = Constants.isGoCQHttpAdmin(senderRole);
+        commandHandler.handleChatSync(messageText, hasPermission);
+
+        // 发送消息事件
+        fireMessageEvent(groupId, senderName, messageText);
+    }
+
+    private void handleSpecialCommands(String message) {
+        switch (message) {
+            case Constants.CMD_ONLINE:
+                logger.info("Received !!online command");
+                break;
+            case Constants.CMD_PING:
+                qqChat.sendMessage("pong!!", "pong");
+                break;
+            case Constants.CMD_HELP:
+                qqChat.sendMessage("FSP-ChatBridgeVelocity\n!!help\t显示此信息\n!!mc\t发送信息到mc\n!!chatSync on/off\t聊天同步\n!!online\t显示在线玩家\n!!ping\tpong!!", "help");
+                break;
+            case Constants.CMD_STATUS:
+                logger.info("Received status command");
+                break;
         }
     }
 
@@ -76,14 +95,17 @@ public class GoCQHttpHandler extends Handler{
         return gson.toJson(new GoCQHttpSendGroupMsg(group, msg, "0"));
     }
 
-    private String getName(JsonObject sender) {
-        if (!sender.get("card").getAsString().equals("")) {
-            return sender.get("card").getAsString();
-        }
-        return sender.get("nickname").getAsString();
+    @Override
+    protected void fireMessageEvent(String group, String sender, String message) {
+        QQSender qqSender = new QQSender(sender, sender, "member", "");
+        server.getEventManager().fire(new QQMessageEvent(group, qqSender, message));
     }
 
-    private boolean hasPermission(String permission) {
-        return permission.equals("admin") || permission.equals("owner");
+    private String getName(JsonObject sender) {
+        String card = sender.get("card").getAsString();
+        if (card != null && !card.isEmpty()) {
+            return card;
+        }
+        return sender.get("nickname").getAsString();
     }
 }

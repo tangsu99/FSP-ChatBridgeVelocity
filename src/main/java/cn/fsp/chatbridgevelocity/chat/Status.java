@@ -8,9 +8,9 @@ public class Status {
     public static boolean kookChatStatus = false;
 
     public static void init() {
-        ChatForwardStatus = ChatBridgeVelocity.config.ChatForwardEnabled();
-        qqChatStatus = ChatBridgeVelocity.config.getQQChatEnabled();
-        kookChatStatus = ChatBridgeVelocity.config.getKookEnabled();
+//        ChatForwardStatus = ChatBridgeVelocity.config.ChatForwardEnabled();
+//        qqChatStatus = ChatBridgeVelocity.config.getQQChatEnabled();
+//        kookChatStatus = ChatBridgeVelocity.config.getKookEnabled();
     }
 
     public static String isOnline() {
