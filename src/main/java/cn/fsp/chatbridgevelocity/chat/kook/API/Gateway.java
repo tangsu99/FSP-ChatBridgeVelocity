@@ -23,17 +23,13 @@ public class Gateway {
                 .build();
     }
 
-    public URI getGatewayURL() {
+    public URI getGatewayURL() throws IOException, InterruptedException {
         HttpResponse<String> response;
-        try {
-            response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (IOException | InterruptedException e) {
-            return null;
-        }
+        response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         JsonObject jsonObject = JsonUtil.getJsonObject(response.body());
         int code = jsonObject.get("code").getAsInt();
         if (response.statusCode() != 200 || code != 0) {
-            return null;
+            throw new  GatewayError(response.body());
         }
         return URIUtil.createURI(jsonObject.getAsJsonObject("data").get("url").getAsString());
     }

@@ -1,10 +1,16 @@
 package cn.fsp.chatbridgevelocity;
 
-import cn.fsp.chatbridgevelocity.chat.ChatForward;
-import cn.fsp.chatbridgevelocity.chat.Status;
-import cn.fsp.chatbridgevelocity.chat.kook.API.ChannelMessage;
+import cn.fsp.chatbridgevelocity.chat.ChatEventHandler;
+import cn.fsp.chatbridgevelocity.chat.MessageFormatter;
+import cn.fsp.chatbridgevelocity.chat.StatusManager;
 import cn.fsp.chatbridgevelocity.chat.kook.API.Gateway;
+import cn.fsp.chatbridgevelocity.chat.platform.ChatPlatform;
+import cn.fsp.chatbridgevelocity.chat.platform.KookPlatform;
+import cn.fsp.chatbridgevelocity.chat.platform.QQPlatform;
+import cn.fsp.chatbridgevelocity.chat.qq.QQChat;
 import cn.fsp.chatbridgevelocity.chat.kook.KookClient;
+import cn.fsp.chatbridgevelocity.chat.qq.handler.OneBot11Handler;
+import cn.fsp.chatbridgevelocity.chat.util.URIUtil;
 import cn.fsp.chatbridgevelocity.command.CmdBuilder;
 import cn.fsp.chatbridgevelocity.config.Config;
 import cn.fsp.chatbridgevelocity.serverPacket.SocketServer;
@@ -18,7 +24,6 @@ import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.proxy.ProxyServer;
 import org.slf4j.Logger;
 
-import java.io.IOException;
 import java.net.URI;
 
 @Plugin(
@@ -38,55 +43,100 @@ public class ChatBridgeVelocity {
     public Injector injector;
     @Inject
     public ProxyServer server;
-    public static Config config;
-    public ChatForward chatForward;
-    private SocketServer socketServer;
-    private Gateway gateway;
-    private KookClient kookClient;
-    public static ChannelMessage channelMessage;
+    public Config config;
+    public StatusManager statusManager;
+    public MessageFormatter messageFormatter;
+    public ChatPlatform qqPlatform;
+    public ChatPlatform kookPlatform;
+    public ChatEventHandler chatEventHandler;
+    public SocketServer socketServer;
+    public static ChatBridgeVelocity cbv;
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
+        cbv = this;
         config = new Config();
-        Status.init();
-        socketServer = new SocketServer(this);
-        chatForward = new ChatForward(this);
+        statusManager = new StatusManager();
+        messageFormatter = new MessageFormatter(config);
+
+        // 初始化状态
+        statusManager.setChatForwardEnabled(config.ChatForwardEnabled());
+        statusManager.setQqChatEnabled(config.getQQChatEnabled());
+        statusManager.setKookChatEnabled(config.getKookEnabled());
+
+        // 初始化平台
+        initializePlatforms();
+
+        chatEventHandler = new ChatEventHandler(this, statusManager, messageFormatter, qqPlatform, kookPlatform);
+        server.getEventManager().register(this, chatEventHandler);
+
+        // 初始化SocketServer
         try {
+            socketServer = new SocketServer(this);
             socketServer.startListener();
-        } catch (IOException e) {
-//            throw new RuntimeException(e);
+        } catch (Exception e) {
+            logger.error("Failed to start socket server", e);
         }
-        // kook 互通
-        kook();
-        server.getEventManager().register(this, chatForward);
+
         commandManager.register(injector.getInstance(CmdBuilder.class).register(this));
+    }
+
+    private void initializePlatforms() {
+        if (statusManager.isQqChatEnabled()) {
+            try {
+                URI qqUri = URIUtil.createURI("ws://" + config.getHost() + ":" + config.getPort() + "/");
+                OneBot11Handler handler = new OneBot11Handler(server, logger, config);
+                QQChat qqChat = new QQChat(qqUri, this, server, logger, config, handler, statusManager);
+                qqChat.addHeader("Authorization", "Bearer " + config.getToken());
+                qqPlatform = new QQPlatform(qqChat);
+                qqPlatform.connect();
+                logger.info("QQ platform initialized successfully");
+            } catch (Exception e) {
+                logger.error("Failed to initialize QQ platform", e);
+                statusManager.setQqChatEnabled(false);
+            }
+        }
+
+        if (statusManager.isKookChatEnabled()) {
+            try {
+                Gateway gateway = new Gateway(config.getKookBotToken(), 0);
+                KookClient kookClient = new KookClient(gateway.getGatewayURL(), this);
+                kookPlatform = new KookPlatform(kookClient, config);
+                kookPlatform.connect();
+                logger.info("Kook platform initialized successfully");
+            } catch (Exception e) {
+                logger.error("Failed to initialize Kook platform", e);
+                statusManager.setKookChatEnabled(false);
+            }
+        }
     }
 
     @Subscribe
     public void onProxyShutdownEvent(ProxyShutdownEvent event) {
-        socketServer.close();
-        chatForward.qqChatClose();
-    }
-
-    private void kook() {
-        if (!Status.kookChatStatus) {
-            logger.info("kook聊天互通已禁用");
-            return;
+        if (socketServer != null) {
+            socketServer.close();
         }
-        this.gateway = new Gateway(config.getKookBotToken(), 0);
-        URI uri = gateway.getGatewayURL();
-        if (uri == null) {
-            logger.error("kook 网关获取错误");
-            return;
+        if (qqPlatform != null) {
+            qqPlatform.disconnect();
         }
-        channelMessage = new ChannelMessage(config.getKookBotToken());
-        this.kookClient = new KookClient(uri, this);
-        this.kookClient.connect();
+        if (kookPlatform != null) {
+            kookPlatform.disconnect();
+        }
     }
 
     public void reload() {
         config.reLoadConfig();
-        chatForward.reload();
-        kookClient._reconnect();
+        statusManager.setChatForwardEnabled(config.ChatForwardEnabled());
+        statusManager.setQqChatEnabled(config.getQQChatEnabled());
+        statusManager.setKookChatEnabled(config.getKookEnabled());
+
+        // 重新初始化平台
+        if (qqPlatform != null) {
+            qqPlatform.disconnect();
+        }
+        if (kookPlatform != null) {
+            kookPlatform.disconnect();
+        }
+        initializePlatforms();
     }
 }

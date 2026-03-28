@@ -1,7 +1,6 @@
 package cn.fsp.chatbridgevelocity.serverPacket;
 
 import cn.fsp.chatbridgevelocity.ChatBridgeVelocity;
-import cn.fsp.chatbridgevelocity.chat.ChatForward;
 import cn.fsp.chatbridgevelocity.config.Config;
 import cn.fsp.chatbridgevelocity.event.SocketEvent;
 import com.velocitypowered.api.proxy.ProxyServer;
@@ -17,14 +16,12 @@ public class SocketServer implements Runnable {
     private ProxyServer server;
     private Config config;
     private ServerSocket serverSocket;
-    ChatForward chatForward;
     private boolean start;
 
     public SocketServer(ChatBridgeVelocity plugin) {
         this.plugin = plugin;
         this.server = plugin.server;
         this.config = plugin.config;
-        this.chatForward = plugin.chatForward;
         this.start = true;
         try {
             serverSocket = new ServerSocket(config.getStatusReceivedPort());
