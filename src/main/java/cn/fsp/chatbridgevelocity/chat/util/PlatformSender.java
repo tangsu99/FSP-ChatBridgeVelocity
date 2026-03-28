@@ -6,4 +6,5 @@ package cn.fsp.chatbridgevelocity.chat.util;
  */
 public interface PlatformSender {
     void reply(String message);
+    PlatformSender getSender();
 }

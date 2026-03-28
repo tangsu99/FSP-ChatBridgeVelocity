@@ -2,6 +2,7 @@ package cn.fsp.chatbridgevelocity.chat;
 
 import cn.fsp.chatbridgevelocity.ChatBridgeVelocity;
 import cn.fsp.chatbridgevelocity.chat.platform.ChatPlatform;
+import cn.fsp.chatbridgevelocity.chat.util.QQPlatformSender;
 import cn.fsp.chatbridgevelocity.config.Config;
 import cn.fsp.chatbridgevelocity.event.KookMessageEvent;
 import cn.fsp.chatbridgevelocity.event.PlatformCommandEvent;
@@ -186,7 +187,13 @@ public class ChatEventHandler {
         if (command.equals("!!online")) {
             // 处理在线命令
             sender.reply("Online players: " + server.getPlayerCount());
-        } else if (command.startsWith("!!chatSync")) {
+        } else if (command.startsWith("!!mc")) {
+            server.getEventManager().fire(
+                new QQMessageEvent(((QQPlatformSender) sender.getSender()).getGroup(),
+                ((QQPlatformSender) sender.getSender()).getMsgSender(),
+                command.substring(3).trim())
+            );
+        }else if (command.startsWith("!!chatSync")) {
             // 处理聊天同步命令
             handleChatSyncCommand(command, sender, platform);
         } else if (command.equals("!!ping")) {
@@ -199,9 +206,6 @@ public class ChatEventHandler {
     }
 
     private void handleChatSyncCommand(String command, PlatformSender sender, String platform) {
-        // 简单的权限检查，假设所有用户都有权限或根据平台检查
-        boolean hasPermission = true; // 简化，实际可根据平台用户角色
-
         String cmd = command.substring(10).trim();
         if (cmd.equals("on")) {
             if (platform.equals("QQ") && qqPlatform != null) {

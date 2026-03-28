@@ -58,7 +58,7 @@ public class OneBot11Handler extends Handler {
 
         // 检查是否是命令
         if (messageText.startsWith("!!")) {
-            PlatformSender platformSender = new QQPlatformSender(qqChat, config.getQQGroup());
+            PlatformSender platformSender = new QQPlatformSender(qqChat, config.getQQGroup()).setMessageSender(qqSender);
             server.getEventManager().fire(new PlatformCommandEvent("QQ", messageText, platformSender));
             return;
         }
@@ -73,11 +73,7 @@ public class OneBot11Handler extends Handler {
             }
             // 广播到游戏内
             fireMessageEvent(groupId, qqSender, processedMsg);
-            return;
         }
-
-        // 发送消息事件
-        fireMessageEvent(groupId, qqSender, messageText);
     }
 
     @Override

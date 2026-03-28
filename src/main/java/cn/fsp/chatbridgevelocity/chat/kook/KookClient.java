@@ -162,5 +162,10 @@ public class KookClient extends WebSocketClient {
                 kookClient.plugin.logger.warn("Kook platform not available for reply");
             }
         }
+
+        @Override
+        public PlatformSender getSender() {
+            return this;
+        }
     }
 }
