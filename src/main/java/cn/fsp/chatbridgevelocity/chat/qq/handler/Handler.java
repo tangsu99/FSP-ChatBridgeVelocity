@@ -3,6 +3,7 @@ package cn.fsp.chatbridgevelocity.chat.qq.handler;
 import cn.fsp.chatbridgevelocity.chat.message.Message;
 import cn.fsp.chatbridgevelocity.chat.qq.QQChat;
 import cn.fsp.chatbridgevelocity.chat.qq.command.QQCommandHandler;
+import cn.fsp.chatbridgevelocity.chat.util.QQSender;
 import cn.fsp.chatbridgevelocity.config.Config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -49,5 +50,5 @@ public abstract class Handler {
     /**
      * 构建QQ消息事件
      */
-    protected abstract void fireMessageEvent(String group, String sender, String message);
+    protected abstract void fireMessageEvent(String group, QQSender qqSender, String message);
 }

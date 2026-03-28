@@ -9,7 +9,7 @@ import cn.fsp.chatbridgevelocity.chat.platform.KookPlatform;
 import cn.fsp.chatbridgevelocity.chat.platform.QQPlatform;
 import cn.fsp.chatbridgevelocity.chat.qq.QQChat;
 import cn.fsp.chatbridgevelocity.chat.kook.KookClient;
-import cn.fsp.chatbridgevelocity.chat.qq.handler.GoCQHttpHandler;
+import cn.fsp.chatbridgevelocity.chat.qq.handler.OneBot11Handler;
 import cn.fsp.chatbridgevelocity.chat.util.URIUtil;
 import cn.fsp.chatbridgevelocity.command.CmdBuilder;
 import cn.fsp.chatbridgevelocity.config.Config;
@@ -85,7 +85,7 @@ public class ChatBridgeVelocity {
         if (statusManager.isQqChatEnabled()) {
             try {
                 URI qqUri = URIUtil.createURI("ws://" + config.getHost() + ":" + config.getPort() + "/");
-                GoCQHttpHandler handler = new GoCQHttpHandler(server, logger, config);
+                OneBot11Handler handler = new OneBot11Handler(server, logger, config);
                 QQChat qqChat = new QQChat(qqUri, this, server, logger, config, handler, statusManager);
                 qqChat.addHeader("Authorization", "Bearer " + config.getToken());
                 qqPlatform = new QQPlatform(qqChat);

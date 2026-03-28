@@ -20,12 +20,12 @@ public class Constants {
     // QQ权限
     public static final String PERMISSION_ADMIN = "ADMINISTRATOR";
     public static final String PERMISSION_OWNER = "OWNER";
-    public static final String PERMISSION_ADMIN_GO_CQHTTP = "admin";
-    public static final String PERMISSION_OWNER_GO_CQHTTP = "owner";
+    public static final String PERMISSION_ADMIN_ONEBOT11 = "admin";
+    public static final String PERMISSION_OWNER_ONEBOT11 = "owner";
 
-    // Go-CQHTTP权限检查
-    public static boolean isGoCQHttpAdmin(String role) {
-        return PERMISSION_ADMIN_GO_CQHTTP.equals(role) || PERMISSION_OWNER_GO_CQHTTP.equals(role);
+    // OneBot11权限检查
+    public static boolean isOneBot11Admin(String role) {
+        return PERMISSION_ADMIN_ONEBOT11.equals(role) || PERMISSION_OWNER_ONEBOT11.equals(role);
     }
 
     // 聊天同步标志

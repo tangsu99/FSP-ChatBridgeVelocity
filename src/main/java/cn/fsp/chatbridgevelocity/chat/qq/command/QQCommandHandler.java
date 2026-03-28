@@ -60,10 +60,10 @@ public class QQCommandHandler {
     }
 
     /**
-     * 检查Go-CQHTTP用户是否有权限
+     * 检查OneBot11用户是否有权限
      */
     public static boolean hasPermission(String role) {
-        return Constants.isGoCQHttpAdmin(role);
+        return Constants.isOneBot11Admin(role);
     }
 
     public void setQQChat(QQChat qqChat) {

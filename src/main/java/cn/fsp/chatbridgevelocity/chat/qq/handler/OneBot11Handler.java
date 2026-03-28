@@ -1,7 +1,7 @@
 package cn.fsp.chatbridgevelocity.chat.qq.handler;
 
 import cn.fsp.chatbridgevelocity.chat.Constants;
-import cn.fsp.chatbridgevelocity.chat.qq.GoCQHttpSendGroupMsg;
+import cn.fsp.chatbridgevelocity.chat.qq.OneBot11SendGroupMsg;
 import cn.fsp.chatbridgevelocity.chat.qq.command.QQCommandHandler;
 import cn.fsp.chatbridgevelocity.chat.util.PlatformSender;
 import cn.fsp.chatbridgevelocity.chat.util.QQPlatformSender;
@@ -14,12 +14,12 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import org.slf4j.Logger;
 
 /**
- * Go-CQHTTP机器人框架处理器
- * 负责处理来自Go-CQHTTP框架的QQ消息
+ * OneBot11机器人框架处理器
+ * 负责处理来自OneBot11框架的QQ消息
  */
-public class GoCQHttpHandler extends Handler {
+public class OneBot11Handler extends Handler {
 
-    public GoCQHttpHandler(ProxyServer server, Logger logger, Config config) {
+    public OneBot11Handler(ProxyServer server, Logger logger, Config config) {
         super(server, logger, config);
         this.commandHandler = new QQCommandHandler(null, message, logger);
     }
@@ -36,7 +36,7 @@ public class GoCQHttpHandler extends Handler {
                 handleGroupMessage(jsonObject);
             }
         } catch (Exception e) {
-            logger.error("Error processing GoCQHttp message", e);
+            logger.error("Error processing OneBot11 message", e);
         }
     }
 
@@ -54,6 +54,9 @@ public class GoCQHttpHandler extends Handler {
         JsonObject sender = jsonObject.get("sender").getAsJsonObject();
         String senderName = getName(sender);
         String senderRole = sender.has("role") ? sender.get("role").getAsString() : "member";
+        String senderQQ = sender.get("user_id").getAsNumber().toString();
+
+        QQSender qqSender = new QQSender(senderName, senderName, senderRole, senderQQ);
 
         // 检查是否是命令
         if (messageText.startsWith("!!")) {
@@ -71,22 +74,21 @@ public class GoCQHttpHandler extends Handler {
                 processedMsg = messageText.substring(config.getQQRespondPrefix().length()).trim();
             }
             // 广播到游戏内
-            fireMessageEvent(groupId, senderName, processedMsg);
+            fireMessageEvent(groupId, qqSender, processedMsg);
             return;
         }
 
         // 发送消息事件
-        fireMessageEvent(groupId, senderName, messageText);
+        fireMessageEvent(groupId, qqSender, messageText);
     }
 
     @Override
     public String send(String group, String msg) {
-        return gson.toJson(new GoCQHttpSendGroupMsg(group, msg, "0"));
+        return gson.toJson(new OneBot11SendGroupMsg(group, msg, "0"));
     }
 
     @Override
-    protected void fireMessageEvent(String group, String sender, String message) {
-        QQSender qqSender = new QQSender(sender, sender, "member", "");
+    protected void fireMessageEvent(String group, QQSender qqSender, String message) {
         server.getEventManager().fire(new QQMessageEvent(group, qqSender, message));
     }
 
