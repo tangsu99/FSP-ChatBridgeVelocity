@@ -1,8 +1,8 @@
-package cn.fsp.chatbridgevelocity.refactoring.serverPacket;
+package cn.fsp.chatbridgevelocity.serverPacket;
 
 import cn.fsp.chatbridgevelocity.ChatBridgeVelocity;
-import cn.fsp.chatbridgevelocity.refactoring.config.Config;
-import cn.fsp.chatbridgevelocity.refactoring.event.SocketEvent;
+import cn.fsp.chatbridgevelocity.config.Config;
+import cn.fsp.chatbridgevelocity.event.SocketEvent;
 import com.velocitypowered.api.proxy.ProxyServer;
 
 import java.io.BufferedReader;

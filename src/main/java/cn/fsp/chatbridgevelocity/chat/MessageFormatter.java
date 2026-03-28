@@ -1,7 +1,6 @@
 package cn.fsp.chatbridgevelocity.chat;
 
-import cn.fsp.chatbridgevelocity.refactoring.config.Config;
-import com.velocitypowered.api.command.CommandSource;
+import cn.fsp.chatbridgevelocity.config.Config;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 

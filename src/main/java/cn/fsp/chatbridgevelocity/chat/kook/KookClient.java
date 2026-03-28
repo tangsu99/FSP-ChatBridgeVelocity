@@ -5,9 +5,11 @@ import cn.fsp.chatbridgevelocity.chat.Status;
 import cn.fsp.chatbridgevelocity.chat.kook.signaling.Hello;
 import cn.fsp.chatbridgevelocity.chat.kook.signaling.Ping;
 import cn.fsp.chatbridgevelocity.chat.util.JsonUtil;
+import cn.fsp.chatbridgevelocity.chat.util.PlatformSender;
 import cn.fsp.chatbridgevelocity.chat.util.URIUtil;
-import cn.fsp.chatbridgevelocity.refactoring.config.Config;
-import cn.fsp.chatbridgevelocity.refactoring.event.KookMessageEvent;
+import cn.fsp.chatbridgevelocity.config.Config;
+import cn.fsp.chatbridgevelocity.event.KookMessageEvent;
+import cn.fsp.chatbridgevelocity.event.PlatformCommandEvent;
 import com.google.gson.JsonObject;
 import com.velocitypowered.api.scheduler.ScheduledTask;
 import org.java_websocket.client.WebSocketClient;
@@ -111,7 +113,12 @@ public class KookClient extends WebSocketClient {
     }
 
     private void msgEvent(String server, String channel, String sender, String message) {
-        plugin.server.getEventManager().fire(new KookMessageEvent(server, channel, sender, message));
+        if (message.startsWith("!!")) {
+            PlatformSender platformSender = new KookPlatformSender(this, channel);
+            plugin.server.getEventManager().fire(new PlatformCommandEvent("KOOK", message, platformSender));
+        } else {
+            plugin.server.getEventManager().fire(new KookMessageEvent(server, channel, sender, message));
+        }
     }
 
     public void close() {
@@ -138,5 +145,22 @@ public class KookClient extends WebSocketClient {
                         })
                 .repeat(10L, TimeUnit.SECONDS)
                 .schedule();
+    }
+
+    private static class KookPlatformSender implements PlatformSender {
+        private final KookClient kookClient;
+
+        public KookPlatformSender(KookClient kookClient, String channel) {
+            this.kookClient = kookClient;
+        }
+
+        @Override
+        public void reply(String message) {
+            if (kookClient.plugin.kookPlatform != null) {
+                kookClient.plugin.kookPlatform.sendMessage(message, "reply");
+            } else {
+                kookClient.plugin.logger.warn("Kook platform not available for reply");
+            }
+        }
     }
 }

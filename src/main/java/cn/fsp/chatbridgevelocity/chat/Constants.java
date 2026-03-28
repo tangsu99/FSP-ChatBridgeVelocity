@@ -23,11 +23,6 @@ public class Constants {
     public static final String PERMISSION_ADMIN_GO_CQHTTP = "admin";
     public static final String PERMISSION_OWNER_GO_CQHTTP = "owner";
 
-    // Mirai权限检查
-    public static boolean isMiraiAdmin(String permission) {
-        return PERMISSION_ADMIN.equals(permission) || PERMISSION_OWNER.equals(permission);
-    }
-
     // Go-CQHTTP权限检查
     public static boolean isGoCQHttpAdmin(String role) {
         return PERMISSION_ADMIN_GO_CQHTTP.equals(role) || PERMISSION_OWNER_GO_CQHTTP.equals(role);

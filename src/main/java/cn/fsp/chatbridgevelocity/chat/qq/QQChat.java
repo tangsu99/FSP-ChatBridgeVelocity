@@ -3,7 +3,7 @@ package cn.fsp.chatbridgevelocity.chat.qq;
 import cn.fsp.chatbridgevelocity.ChatBridgeVelocity;
 import cn.fsp.chatbridgevelocity.chat.StatusManager;
 import cn.fsp.chatbridgevelocity.chat.qq.handler.Handler;
-import cn.fsp.chatbridgevelocity.refactoring.config.Config;
+import cn.fsp.chatbridgevelocity.config.Config;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.scheduler.ScheduledTask;
 import org.java_websocket.client.WebSocketClient;

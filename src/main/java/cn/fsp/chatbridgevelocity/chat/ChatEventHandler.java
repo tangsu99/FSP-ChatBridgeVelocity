@@ -2,9 +2,13 @@ package cn.fsp.chatbridgevelocity.chat;
 
 import cn.fsp.chatbridgevelocity.ChatBridgeVelocity;
 import cn.fsp.chatbridgevelocity.chat.platform.ChatPlatform;
-import cn.fsp.chatbridgevelocity.refactoring.config.Config;
-import cn.fsp.chatbridgevelocity.refactoring.event.KookMessageEvent;
-import cn.fsp.chatbridgevelocity.refactoring.event.SocketEvent;
+import cn.fsp.chatbridgevelocity.config.Config;
+import cn.fsp.chatbridgevelocity.event.KookMessageEvent;
+import cn.fsp.chatbridgevelocity.event.PlatformCommandEvent;
+import cn.fsp.chatbridgevelocity.event.QQMessageEvent;
+import cn.fsp.chatbridgevelocity.event.SocketEvent;
+import cn.fsp.chatbridgevelocity.chat.message.Message;
+import cn.fsp.chatbridgevelocity.chat.util.PlatformSender;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.LoginEvent;
@@ -15,8 +19,8 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import org.slf4j.Logger;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 处理Velocity服务器端的聊天事件
@@ -30,9 +34,10 @@ public class ChatEventHandler {
     private final MessageFormatter messageFormatter;
     private final ChatPlatform qqPlatform;
     private final ChatPlatform kookPlatform;
-    private final Map<String, String> playerCurrentServer = new HashMap<>();
-    private final Map<String, Long> timestampMap = new HashMap<>();
+    private final Map<String, String> playerCurrentServer = new ConcurrentHashMap<>();
+    private final Map<String, Long> timestampMap = new ConcurrentHashMap<>();
     private final long cooldownMillis;
+    private final Message message;
 
     public ChatEventHandler(ChatBridgeVelocity plugin, StatusManager statusManager,
                           MessageFormatter messageFormatter, ChatPlatform qqPlatform,
@@ -45,6 +50,7 @@ public class ChatEventHandler {
         this.qqPlatform = qqPlatform;
         this.kookPlatform = kookPlatform;
         this.cooldownMillis = config.getCD() * 1000L;
+        this.message = new Message();
     }
 
     @Subscribe
@@ -126,7 +132,8 @@ public class ChatEventHandler {
             if (statusManager.isQqChatEnabled() && qqPlatform != null) {
                 qqPlatform.sendMessage(joinMessage, String.valueOf(event.hashCode()));
             }
-            if (statusManager.isKookChatEnabled() && kookPlatform != null) {
+            // Kook平台聊天转发常开，直接发送加入消息
+            if (kookPlatform != null) {
                 kookPlatform.sendMessage(joinMessage, "join");
             }
         }
@@ -134,12 +141,8 @@ public class ChatEventHandler {
 
     @Subscribe
     public void onKookMessageEvent(KookMessageEvent event) {
-        if (!statusManager.isKookChatEnabled() || !config.getKookServerID().equals(event.getServer())) {
-            return;
-        }
-
-        if (event.getMessage().startsWith(Constants.CMD_ONLINE)) {
-            // 处理在线指令
+        // Kook平台的聊天转发是常开功能，直接转发所有消息
+        if (!config.getKookServerID().equals(event.getServer())) {
             return;
         }
 
@@ -158,6 +161,67 @@ public class ChatEventHandler {
             }
         });
         logger.info(event.getServerName() + (event.getStatus() == Constants.SERVER_STARTED_STATUS ? " Started!" : " Stopped!"));
+    }
+
+    @Subscribe
+    public void onQQMessageEvent(QQMessageEvent event) {
+        if (
+                !statusManager.isQqChatEnabled()
+                || !config.getQQGroup().equals(event.getGroup())
+                || event.getSender().getQqID().equals(config.getBotQQ())
+        ) return;
+
+        broadcastMessageFromPlatform(event.getSender().getName(), event.getMessage(), Constants.SOURCE_QQ);
+    }
+
+    @Subscribe
+    public void onPlatformCommandEvent(PlatformCommandEvent event) {
+        String command = event.getCommand();
+        PlatformSender sender = event.getSender();
+        String platform = event.getPlatform();
+
+        logger.info("Processing platform command: {} from {}", command, platform);
+
+        // 解析命令
+        if (command.equals("!!online")) {
+            // 处理在线命令
+            sender.reply("Online players: " + server.getPlayerCount());
+        } else if (command.startsWith("!!chatSync")) {
+            // 处理聊天同步命令
+            handleChatSyncCommand(command, sender, platform);
+        } else if (command.equals("!!ping")) {
+            sender.reply("pong!!");
+        } else if (command.equals("!!help")) {
+            sender.reply("FSP-ChatBridgeVelocity\n!!help\t显示此信息\n!!mc\t发送信息到mc\n!!chatSync on/off\t聊天同步\n!!online\t显示在线玩家\n!!ping\tpong!!");
+        } else {
+            sender.reply("Unknown command: " + command);
+        }
+    }
+
+    private void handleChatSyncCommand(String command, PlatformSender sender, String platform) {
+        // 简单的权限检查，假设所有用户都有权限或根据平台检查
+        boolean hasPermission = true; // 简化，实际可根据平台用户角色
+
+        String cmd = command.substring(10).trim();
+        if (cmd.equals("on")) {
+            if (platform.equals("QQ") && qqPlatform != null) {
+                qqPlatform.setSync(true);
+                sender.reply(message.getOn());
+            } else if (platform.equals("KOOK") && kookPlatform != null) {
+                kookPlatform.setSync(true);
+                sender.reply(message.getOn());
+            }
+        } else if (cmd.equals("off")) {
+            if (platform.equals("QQ") && qqPlatform != null) {
+                qqPlatform.setSync(false);
+                sender.reply(message.getOff());
+            } else if (platform.equals("KOOK") && kookPlatform != null) {
+                kookPlatform.setSync(false);
+                sender.reply(message.getOff());
+            }
+        } else {
+            sender.reply("Chat sync help\n!!chatSync on/off\n!!chatsync on/off");
+        }
     }
 
     private void broadcastJoinMessage(String serverName, String playerName) {
@@ -184,7 +248,7 @@ public class ChatEventHandler {
         server.getAllPlayers().forEach(player ->
             player.sendMessage(messageFormatter.formatChatMessage(source, sender, message))
         );
-        logger.info(source + "<" + sender + "> " + message);
+        logger.info("{} <{}> {}", source, sender, message);
     }
 
     private boolean shouldSendJoinMessage(String playerName) {

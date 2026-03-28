@@ -7,7 +7,7 @@ package cn.fsp.chatbridgevelocity.chat.platform;
 import cn.fsp.chatbridgevelocity.chat.kook.API.ChannelMessage;
 import cn.fsp.chatbridgevelocity.chat.kook.KookClient;
 import cn.fsp.chatbridgevelocity.chat.util.ChannelMsgBody;
-import cn.fsp.chatbridgevelocity.refactoring.config.Config;
+import cn.fsp.chatbridgevelocity.config.Config;
 
 public class KookPlatform implements ChatPlatform {
     private final KookClient kookClient;
@@ -33,11 +33,7 @@ public class KookPlatform implements ChatPlatform {
     @Override
     public void sendMessage(String message, String echo) {
         String body = ChannelMsgBody.msgBody(config.getKookChannelID(), message);
-        int result = channelMessage.sendMessage(body);
-        if (result != 0) {
-            // 处理发送失败
-            System.err.println("Failed to send Kook message: " + result);
-        }
+        channelMessage.sendMessage(body);
     }
 
     @Override

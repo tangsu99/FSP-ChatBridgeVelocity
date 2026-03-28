@@ -1,4 +1,4 @@
-package cn.fsp.chatbridgevelocity.refactoring.config;
+package cn.fsp.chatbridgevelocity.config;
 
 public class ConfigStorage {
     boolean chatForwardEnabled = true;
@@ -12,7 +12,6 @@ public class ConfigStorage {
     String QQMessageFormat = "[{0}]<{1}> {2}";
     boolean QQJoinMessageEnabled = true;
     Integer CD = 30;
-    boolean goCQHttp = true;
     String QQJoinFormat = "{0} joined game.";
     String BotQQ = "00000000";
     String QQGroup = "00000000";

@@ -1,4 +1,4 @@
-package cn.fsp.chatbridgevelocity.refactoring.event;
+package cn.fsp.chatbridgevelocity.event;
 
 public class KookMessageEvent {
     private final String server;

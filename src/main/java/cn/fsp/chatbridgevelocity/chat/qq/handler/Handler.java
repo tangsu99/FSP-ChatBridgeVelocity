@@ -2,7 +2,8 @@ package cn.fsp.chatbridgevelocity.chat.qq.handler;
 
 import cn.fsp.chatbridgevelocity.chat.message.Message;
 import cn.fsp.chatbridgevelocity.chat.qq.QQChat;
-import cn.fsp.chatbridgevelocity.refactoring.config.Config;
+import cn.fsp.chatbridgevelocity.chat.qq.command.QQCommandHandler;
+import cn.fsp.chatbridgevelocity.config.Config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.velocitypowered.api.proxy.ProxyServer;
@@ -19,6 +20,7 @@ public abstract class Handler {
     protected final Config config;
     protected final Message message;
     protected QQChat qqChat;
+    protected QQCommandHandler commandHandler;
 
     public Handler(ProxyServer server, Logger logger, Config config) {
         this.server = server;
@@ -29,6 +31,9 @@ public abstract class Handler {
 
     public void setQQChat(QQChat qqChat) {
         this.qqChat = qqChat;
+        if (commandHandler != null) {
+            commandHandler.setQQChat(qqChat);
+        }
     }
 
     /**

@@ -3,9 +3,12 @@ package cn.fsp.chatbridgevelocity.chat.qq.handler;
 import cn.fsp.chatbridgevelocity.chat.Constants;
 import cn.fsp.chatbridgevelocity.chat.qq.GoCQHttpSendGroupMsg;
 import cn.fsp.chatbridgevelocity.chat.qq.command.QQCommandHandler;
+import cn.fsp.chatbridgevelocity.chat.util.PlatformSender;
+import cn.fsp.chatbridgevelocity.chat.util.QQPlatformSender;
 import cn.fsp.chatbridgevelocity.chat.util.QQSender;
-import cn.fsp.chatbridgevelocity.refactoring.config.Config;
-import cn.fsp.chatbridgevelocity.refactoring.event.QQMessageEvent;
+import cn.fsp.chatbridgevelocity.config.Config;
+import cn.fsp.chatbridgevelocity.event.PlatformCommandEvent;
+import cn.fsp.chatbridgevelocity.event.QQMessageEvent;
 import com.google.gson.JsonObject;
 import com.velocitypowered.api.proxy.ProxyServer;
 import org.slf4j.Logger;
@@ -15,7 +18,6 @@ import org.slf4j.Logger;
  * 负责处理来自Go-CQHTTP框架的QQ消息
  */
 public class GoCQHttpHandler extends Handler {
-    private final QQCommandHandler commandHandler;
 
     public GoCQHttpHandler(ProxyServer server, Logger logger, Config config) {
         super(server, logger, config);
@@ -39,6 +41,10 @@ public class GoCQHttpHandler extends Handler {
     }
 
     private void handleGroupMessage(JsonObject jsonObject) {
+        if (!jsonObject.has("group_id") || !jsonObject.has("message") || !jsonObject.has("sender")) {
+            return;
+        }
+
         String groupId = jsonObject.get("group_id").getAsString();
         if (!groupId.equals(config.getQQGroup())) {
             return;
@@ -47,7 +53,14 @@ public class GoCQHttpHandler extends Handler {
         String messageText = jsonObject.get("message").getAsString();
         JsonObject sender = jsonObject.get("sender").getAsJsonObject();
         String senderName = getName(sender);
-        String senderRole = sender.get("role").getAsString();
+        String senderRole = sender.has("role") ? sender.get("role").getAsString() : "member";
+
+        // 检查是否是命令
+        if (messageText.startsWith("!!")) {
+            PlatformSender platformSender = new QQPlatformSender(qqChat, config.getQQGroup());
+            server.getEventManager().fire(new PlatformCommandEvent("QQ", messageText, platformSender));
+            return;
+        }
 
         // 处理聊天同步前缀
         if (messageText.startsWith(config.getQQRespondPrefix()) || qqChat.getSync()) {
@@ -62,32 +75,8 @@ public class GoCQHttpHandler extends Handler {
             return;
         }
 
-        // 处理特殊命令
-        handleSpecialCommands(messageText);
-
-        // 处理权限相关命令
-        boolean hasPermission = Constants.isGoCQHttpAdmin(senderRole);
-        commandHandler.handleChatSync(messageText, hasPermission);
-
         // 发送消息事件
         fireMessageEvent(groupId, senderName, messageText);
-    }
-
-    private void handleSpecialCommands(String message) {
-        switch (message) {
-            case Constants.CMD_ONLINE:
-                logger.info("Received !!online command");
-                break;
-            case Constants.CMD_PING:
-                qqChat.sendMessage("pong!!", "pong");
-                break;
-            case Constants.CMD_HELP:
-                qqChat.sendMessage("FSP-ChatBridgeVelocity\n!!help\t显示此信息\n!!mc\t发送信息到mc\n!!chatSync on/off\t聊天同步\n!!online\t显示在线玩家\n!!ping\tpong!!", "help");
-                break;
-            case Constants.CMD_STATUS:
-                logger.info("Received status command");
-                break;
-        }
     }
 
     @Override

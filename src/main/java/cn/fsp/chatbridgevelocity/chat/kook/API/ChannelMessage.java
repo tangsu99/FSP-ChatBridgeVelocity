@@ -32,11 +32,10 @@ public class ChannelMessage {
         try {
             response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (IOException | InterruptedException e) {
-//            throw new RuntimeException(e);
-            return 1000;
+            throw new MessageCreateError(e.getMessage());
         }
         if (response.statusCode() != 200) {
-            return 1000;
+            throw new MessageCreateError(response.body());
         }
         JsonObject jsonObject = JsonUtil.getJsonObject(response.body());
         return jsonObject.get("code").getAsInt();

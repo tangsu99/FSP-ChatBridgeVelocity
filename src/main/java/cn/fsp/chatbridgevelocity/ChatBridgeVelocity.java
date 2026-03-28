@@ -3,17 +3,17 @@ package cn.fsp.chatbridgevelocity;
 import cn.fsp.chatbridgevelocity.chat.ChatEventHandler;
 import cn.fsp.chatbridgevelocity.chat.MessageFormatter;
 import cn.fsp.chatbridgevelocity.chat.StatusManager;
+import cn.fsp.chatbridgevelocity.chat.kook.API.Gateway;
 import cn.fsp.chatbridgevelocity.chat.platform.ChatPlatform;
 import cn.fsp.chatbridgevelocity.chat.platform.KookPlatform;
 import cn.fsp.chatbridgevelocity.chat.platform.QQPlatform;
 import cn.fsp.chatbridgevelocity.chat.qq.QQChat;
 import cn.fsp.chatbridgevelocity.chat.kook.KookClient;
 import cn.fsp.chatbridgevelocity.chat.qq.handler.GoCQHttpHandler;
-import cn.fsp.chatbridgevelocity.chat.qq.handler.MiraiHandler;
 import cn.fsp.chatbridgevelocity.chat.util.URIUtil;
-import cn.fsp.chatbridgevelocity.refactoring.command.CmdBuilder;
-import cn.fsp.chatbridgevelocity.refactoring.config.Config;
-import cn.fsp.chatbridgevelocity.refactoring.serverPacket.SocketServer;
+import cn.fsp.chatbridgevelocity.command.CmdBuilder;
+import cn.fsp.chatbridgevelocity.config.Config;
+import cn.fsp.chatbridgevelocity.serverPacket.SocketServer;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.velocitypowered.api.command.CommandManager;
@@ -84,17 +84,9 @@ public class ChatBridgeVelocity {
     private void initializePlatforms() {
         if (statusManager.isQqChatEnabled()) {
             try {
-                URI qqUri;
-                QQChat qqChat;
-                if (config.getGoCQHttp()) {
-                    qqUri = URIUtil.createURI("ws://" + config.getHost() + ":" + config.getPort() + "/");
-                    GoCQHttpHandler handler = new GoCQHttpHandler(server, logger, config);
-                    qqChat = new QQChat(qqUri, this, server, logger, config, handler, statusManager);
-                } else {
-                    qqUri = URIUtil.createURI("ws://" + config.getHost() + ":" + config.getPort() + "/all?verifyKey=" + config.getToken() + "&qq=" + config.getBotQQ());
-                    MiraiHandler handler = new MiraiHandler(server, logger, config);
-                    qqChat = new QQChat(qqUri, this, server, logger, config, handler, statusManager);
-                }
+                URI qqUri = URIUtil.createURI("ws://" + config.getHost() + ":" + config.getPort() + "/");
+                GoCQHttpHandler handler = new GoCQHttpHandler(server, logger, config);
+                QQChat qqChat = new QQChat(qqUri, this, server, logger, config, handler, statusManager);
                 qqChat.addHeader("Authorization", "Bearer " + config.getToken());
                 qqPlatform = new QQPlatform(qqChat);
                 qqPlatform.connect();
@@ -107,8 +99,8 @@ public class ChatBridgeVelocity {
 
         if (statusManager.isKookChatEnabled()) {
             try {
-                URI kookUri = URIUtil.createURI("wss://gateway.kookapp.cn");
-                KookClient kookClient = new KookClient(kookUri, this);
+                Gateway gateway = new Gateway(config.getKookBotToken(), 0);
+                KookClient kookClient = new KookClient(gateway.getGatewayURL(), this);
                 kookPlatform = new KookPlatform(kookClient, config);
                 kookPlatform.connect();
                 logger.info("Kook platform initialized successfully");

@@ -1,4 +1,4 @@
-package cn.fsp.chatbridgevelocity.refactoring.config;
+package cn.fsp.chatbridgevelocity.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -69,10 +69,6 @@ public class Config {
 
     public boolean getQQJoinMessageEnabled() {
         return cfg.QQJoinMessageEnabled;
-    }
-
-    public boolean getGoCQHttp() {
-        return cfg.goCQHttp;
     }
 
     public String getQQJoinFormat() {
