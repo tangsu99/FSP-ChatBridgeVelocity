@@ -7,10 +7,8 @@
 /cbv            显示帮助
 ```
 * QQ群聊天转发
-* 使用 [go-cqhttp](https://docs.go-cqhttp.org/guide/#go-cqhttp)，并配置正向 Websocket
-* 或使用 [mirai](https://docs.mirai.mamoe.net/) 的 [mirai-api-http](https://docs.mirai.mamoe.net/mirai-api-http/)，并配置 ws
-* 使用`mirai-api-http`须在`mirai-api-http`配置文件中开启`verifyKey`，关闭`singleMode`
-* 子服使用 [FSP-ServerStatus](https://github.com/tangsu99/FSP-ServerStatus) 用来发送服务器开关服状态
+* 使用 [OneBot11协议](https://docs.go-cqhttp.org/guide/#go-cqhttp)，正向 Websocket
+* 子服使用 [FSP-ServerStatus](https://github.com/tangsu99/FSP-ServerStatus) 用来发送服务器开关服状态(等待完善)
 * 群内指令
 ```
 !!help              显示帮助
@@ -75,8 +73,6 @@
   // QQ群玩家加入信息冷却时间，默认30秒，防止玩家反复进出服务器造成群内刷屏
   "CD": 30,
   
-  // 是否使用 goCQHttp，使用 miari-api-http 时须更改为 false
-  "goCQHttp": true,
   // QQ群玩家加入信息格式化
   "QQJoinFormat": "{0} joined game.",
 
@@ -88,8 +84,6 @@
   "host": "127.0.0.1",
   // 服务器端口
   "port": 6700,
-  // go-cqhttp 配置文件内设置的 access-token
-  // 或者 miari-api-http 配置文件内设置的 verifyKey
   "token": "TOKEN",
   
   // 接收子服务器开关服状态的端口
