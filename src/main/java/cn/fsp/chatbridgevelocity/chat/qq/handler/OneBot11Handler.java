@@ -2,7 +2,6 @@ package cn.fsp.chatbridgevelocity.chat.qq.handler;
 
 import cn.fsp.chatbridgevelocity.chat.Constants;
 import cn.fsp.chatbridgevelocity.chat.qq.OneBot11SendGroupMsg;
-import cn.fsp.chatbridgevelocity.chat.qq.command.QQCommandHandler;
 import cn.fsp.chatbridgevelocity.chat.util.PlatformSender;
 import cn.fsp.chatbridgevelocity.chat.util.QQPlatformSender;
 import cn.fsp.chatbridgevelocity.chat.util.QQSender;
@@ -21,7 +20,6 @@ public class OneBot11Handler extends Handler {
 
     public OneBot11Handler(ProxyServer server, Logger logger, Config config) {
         super(server, logger, config);
-        this.commandHandler = new QQCommandHandler(null, message, logger);
     }
 
     @Override
